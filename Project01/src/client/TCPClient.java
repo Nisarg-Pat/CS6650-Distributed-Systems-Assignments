@@ -8,34 +8,34 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class TCPClient {
-
-  Socket socket;
+public class TCPClient extends AbstractClient {
 
   public TCPClient(String host, int port) throws IOException {
-    socket = new Socket(host, port);
+    super(host, port);
+//    socket = new Socket(host, port);
   }
 
-  public void execute() throws IOException {
-    Scanner sc = new Scanner(System.in);
-    System.out.print("Enter Text: ");
-    String input = sc.nextLine();
-    sc.close();
-
-    OutputStream socketOut = socket.getOutputStream();
-    DataOutputStream dataOut = new DataOutputStream(socketOut);
-    dataOut.writeUTF(input);
-
-    //Receiving the changed string
-    InputStream socketIn = socket.getInputStream();
-    DataInputStream dataIn = new DataInputStream(socketIn);
-    String changedInput = new String(dataIn.readUTF());
-    System.out.println("Server Response: " + changedInput);
-
-    dataIn.close();
-    socketIn.close();
-    dataOut.close();
-    socketOut.close();
-    socket.close();
-  }
+//  @Override
+//  public void execute() throws IOException {
+//    Scanner sc = new Scanner(System.in);
+//    System.out.print("Enter Text: ");
+//    String input = sc.nextLine();
+//    sc.close();
+//
+//    OutputStream socketOut = socket.getOutputStream();
+//    DataOutputStream dataOut = new DataOutputStream(socketOut);
+//    dataOut.writeUTF(input);
+//
+//    //Receiving the changed string
+//    InputStream socketIn = socket.getInputStream();
+//    DataInputStream dataIn = new DataInputStream(socketIn);
+//    String changedInput = new String(dataIn.readUTF());
+//    System.out.println("Server Response: " + changedInput);
+//
+//    dataIn.close();
+//    socketIn.close();
+//    dataOut.close();
+//    socketOut.close();
+//    socket.close();
+//  }
 }

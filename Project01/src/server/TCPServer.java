@@ -23,6 +23,7 @@ public class TCPServer {
     System.out.println("TCPServer started at port: " + port);
     while(true) {
       Socket socket = serverSocket.accept();
+      System.out.println(socket.getInetAddress());
       InputStream socketIn = socket.getInputStream();
       DataInputStream dataIn = new DataInputStream(socketIn);
       String input = new String(dataIn.readUTF());
@@ -33,10 +34,10 @@ public class TCPServer {
       DataOutputStream dataOut = new DataOutputStream(socketOut);
       dataOut.writeUTF(input);
 
-      dataIn.close();
-      socketIn.close();
-      dataOut.close();
-      socketOut.close();
+//      dataIn.close();
+//      socketIn.close();
+//      dataOut.close();
+//      socketOut.close();
     }
     //socket.close();
   }
