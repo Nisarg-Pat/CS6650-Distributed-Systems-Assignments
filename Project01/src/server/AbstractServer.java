@@ -18,10 +18,13 @@ public abstract class AbstractServer {
 
   public String createInputString(Socket socket, String input) {
     StringBuffer sb = new StringBuffer();
-    sb.append("Request Received. InetAddress: ").append(socket.getInetAddress())
-            .append(" Port: ").append(socket.getPort())
+    sb.append("Request Received. InetAddress: ").append(getAddress(socket))
             .append("\nRequest: ").append(input);
     return sb.toString();
+  }
+
+  public String getAddress(Socket socket) {
+    return String.format("InetAddress: %s:%s", socket.getInetAddress(), socket.getPort());
   }
 
   public String processRequest(String input) {

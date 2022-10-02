@@ -9,6 +9,4 @@ public class TCPClientApp extends AbstractClientApp {
     client = new TCPClient(host, port);
     client.execute();
   }
-
-
 }
