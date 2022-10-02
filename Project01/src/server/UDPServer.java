@@ -27,7 +27,7 @@ public class UDPServer extends AbstractServer{
       byte[] buffer = new byte[1000];
       DatagramPacket request = new DatagramPacket(buffer, buffer.length);
       datagramSocket.receive(request);
-      String input = new String(request.getData());
+      String input = new String(request.getData()).substring(0, request.getLength());
 
       System.out.println(createInputString(request.getAddress(), request.getPort(), input));
       String output = processRequest(input);

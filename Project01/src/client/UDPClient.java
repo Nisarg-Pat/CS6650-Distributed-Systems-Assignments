@@ -27,7 +27,7 @@ public class UDPClient extends AbstractClient {
     buffer = new byte[1000];
     DatagramPacket response = new DatagramPacket(buffer, buffer.length);
     datagramSocket.receive(response);
-    String output = new String(response.getData());
+    String output = new String(response.getData()).substring(0, response.getLength());
     System.out.println("Server Response: " + output);
     System.out.println();
   }
