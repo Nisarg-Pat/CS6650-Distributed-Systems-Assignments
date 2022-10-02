@@ -10,15 +10,12 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class TCPServer {
-
-  int port;
+public class TCPServer extends AbstractServer{
   ServerSocket serverSocket;
 
   public TCPServer(int port) throws IOException {
-    this.port = port;
+    super(port);
     serverSocket = new ServerSocket(port);
-
   }
 
   public void execute() throws IOException {
