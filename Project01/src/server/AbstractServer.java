@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -16,15 +17,15 @@ public abstract class AbstractServer {
 
   public abstract void execute() throws IOException;
 
-  public String createInputString(Socket socket, String input) {
+  public String createInputString(InetAddress addr, int port, String input) {
     StringBuffer sb = new StringBuffer();
-    sb.append("Request Received. InetAddress: ").append(getAddress(socket))
+    sb.append("Request Received. InetAddress: ").append(getAddress(addr, port))
             .append("\nRequest: ").append(input);
     return sb.toString();
   }
 
-  public String getAddress(Socket socket) {
-    return String.format("InetAddress: %s:%s", socket.getInetAddress(), socket.getPort());
+  public String getAddress(InetAddress addr, int port) {
+    return String.format("InetAddress: %s:%s", addr, port);
   }
 
   public String processRequest(String input) {

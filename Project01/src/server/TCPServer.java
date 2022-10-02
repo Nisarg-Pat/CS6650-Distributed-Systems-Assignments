@@ -20,14 +20,14 @@ public class TCPServer extends AbstractServer {
     System.out.println();
     while (true) {
       Socket socket = serverSocket.accept();
-      System.out.println("Client connected. " + getAddress(socket));
+      System.out.println("Client connected. " + getAddress(socket.getInetAddress(), socket.getPort()));
       System.out.println();
       BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
       String input = null;
       try {
         while ((input = br.readLine()) != null) {
-          System.out.println(createInputString(socket, input));
+          System.out.println(createInputString(socket.getInetAddress(), socket.getPort(), input));
           String output = processRequest(input);
           System.out.println("Response: " + output);
           System.out.println();
