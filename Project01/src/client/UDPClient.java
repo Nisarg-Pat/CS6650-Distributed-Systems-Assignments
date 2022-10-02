@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import util.DataUtils;
+
 public class UDPClient extends AbstractClient {
 
   DatagramSocket datagramSocket;
@@ -20,6 +22,7 @@ public class UDPClient extends AbstractClient {
 
   @Override
   public void send(String input) throws IOException {
+    //byte[] buffer = DataUtils.encode(input).getBytes();
     byte[] buffer = input.getBytes();
     DatagramPacket request = new DatagramPacket(buffer, input.length(), addr, port);
     datagramSocket.send(request);
@@ -28,6 +31,7 @@ public class UDPClient extends AbstractClient {
     DatagramPacket response = new DatagramPacket(buffer, buffer.length);
     datagramSocket.receive(response);
     String output = new String(response.getData()).substring(0, response.getLength());
+    //output = DataUtils.decode(output);
     System.out.println("Server Response: " + output);
     System.out.println();
   }

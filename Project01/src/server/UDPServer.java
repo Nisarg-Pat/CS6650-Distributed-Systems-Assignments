@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Arrays;
 
+import util.DataUtils;
+
 public class UDPServer extends AbstractServer{
 
   DatagramSocket datagramSocket;
@@ -28,12 +30,14 @@ public class UDPServer extends AbstractServer{
       DatagramPacket request = new DatagramPacket(buffer, buffer.length);
       datagramSocket.receive(request);
       String input = new String(request.getData()).substring(0, request.getLength());
+      //input = DataUtils.decode(input);
 
       System.out.println(createInputString(request.getAddress(), request.getPort(), input));
       String output = processRequest(input);
       System.out.println("Response: " + output);
       System.out.println();
 
+      //byte[] outputByte = DataUtils.encode(output).getBytes();
       byte[] outputByte = output.getBytes();
       DatagramPacket reply = new DatagramPacket(outputByte, output.length(), request.getAddress(), request.getPort());
       datagramSocket.send(reply);
