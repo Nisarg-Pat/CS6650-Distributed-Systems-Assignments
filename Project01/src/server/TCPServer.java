@@ -34,13 +34,16 @@ public class TCPServer extends AbstractServer{
         while((input = br.readLine()) !=null) {
           System.out.println(createInputString(socket, input));
           String output = processRequest(input);
+          System.out.println("Response: " + output);
+          System.out.println();
           out.println(output);
           out.flush();
         }
       } catch (Exception e) {
-        System.out.println(e.toString());
+        //Empty catch
       }
-      System.out.println("Connection closed with"+socket.getInetAddress());
+      System.out.println("Connection closed with "+socket.getInetAddress());
+      System.out.println();
     }
   }
 }

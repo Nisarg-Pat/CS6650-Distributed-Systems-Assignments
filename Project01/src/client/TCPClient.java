@@ -24,6 +24,7 @@ public class TCPClient extends AbstractClient {
     out.flush();
 
     String temp = br.readLine();
-    System.out.println("\nServer Response: " + temp);
+    System.out.println("Server Response: " + temp);
+    System.out.println();
   }
 }

@@ -18,7 +18,7 @@ public abstract class AbstractClient {
     System.out.println("Possible commands: PUT/GET/DELETE/QUIT");
     String input = "";
     while(!input.equals("QUIT")) {
-      System.out.print("\nCommand: ");
+      System.out.print("Command: ");
       input = scanner.nextLine();
       String[] data = input.split(" ");
       String command = data[0];

@@ -29,41 +29,41 @@ public abstract class AbstractServer {
     String command = data[0];
     switch (command) {
       case "PUT":
-        if(checkPut(data)) {
+        if (checkPut(data)) {
           String key = data[1];
           String value = data[2];
           boolean res = db.put(key, value);
-          if(res) {
-            return "";
+          if (res) {
+            return String.format("(%s, %s) added successfully", key, value);
           } else {
-            return "Cannot put key";
+            return String.format("Cannot put (%s, %s) in database.", key, value);
           }
         } else {
-          return "Invalid syntax for PUT";
+          return "Invalid format for PUT. Expected: PUT key value";
         }
       case "GET":
-        if(checkGet(data)) {
+        if (checkGet(data)) {
           String key = data[1];
           String res = db.get(key);
-          if(res.equals("")) {
-            return "Cannot get key";
+          if (res.equals("")) {
+            return key + " is not present in database";
           } else {
             return res;
           }
         } else {
-          return "Invalid syntax for GET";
+          return "Invalid format for GET. Expected: GET key";
         }
       case "DELETE":
-        if(checkDelete(data)) {
+        if (checkDelete(data)) {
           String key = data[1];
           boolean res = db.delete(key);
-          if(res) {
-            return "Successfully deleted key";
+          if (res) {
+            return "Successfully deleted "+key;
           } else {
-            return "Key cannot be deleted";
+            return key + " is not present in database";
           }
         } else {
-          return "Invalid syntax for DELETE";
+          return "Invalid format for DELETE. Expected: DELETE key";
         }
       default:
         return "Invalid command!";
