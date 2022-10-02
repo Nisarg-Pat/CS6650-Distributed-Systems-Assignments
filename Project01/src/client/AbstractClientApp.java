@@ -10,8 +10,8 @@ public abstract class AbstractClientApp {
 
   public static void getHostAndPort(String[] args) {
     if (args.length != 2) {
-      System.out.println("Improper number of arguments!. Required 2 arguments: host port");
-      return;
+      System.out.println("Improper number of arguments! Required 2 arguments: host port");
+      System.exit(1);
     }
 
     try {
@@ -19,6 +19,7 @@ public abstract class AbstractClientApp {
       port = Integer.parseInt(args[1]);
     } catch (NumberFormatException e) {
       System.out.println(args[1] + " is not a valid port number!!");
+      System.exit(1);
     }
   }
 }

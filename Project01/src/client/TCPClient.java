@@ -8,11 +8,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.Socket;
 
 public class TCPClient extends AbstractClient {
 
+  Socket socket;
+
   public TCPClient(String host, int port) throws IOException {
-    super(host, port);
+    super();
+    this.socket = new Socket(host, port);
   }
 
   @Override

@@ -5,12 +5,9 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public abstract class AbstractClient {
-
-  Socket socket;
   Scanner scanner;
 
-  public AbstractClient(String host, int port) throws IOException {
-    this.socket = new Socket(host, port);
+  public AbstractClient() throws IOException {
     scanner = new Scanner(System.in);
   }
 
@@ -51,7 +48,6 @@ public abstract class AbstractClient {
       }
     }
     scanner.close();
-    socket.close();
   }
 
   private boolean checkDelete(String[] data) {
