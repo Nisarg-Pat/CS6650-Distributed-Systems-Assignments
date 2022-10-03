@@ -1,0 +1,42 @@
+
+
+-------------------------------------------------------------------
+2022/10/03 16:25:30:364: UDPServer listening at port: 3214
+
+2022/10/03 16:25:33:515: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:25:33:515: Request: ALL
+2022/10/03 16:25:33:516: RESPONSE(Database Content(Key, Value):
+(Calm, Furious)
+(Answer, Question)
+(Serious, Trivial)
+(Hello, World)
+(Accept, Refuse)
+(Friend, Enemy)
+(Happy, Sad)
+(Possible, Impossible)
+(Inferior, Superior)
+(Expensive, Cheap)
+(Strong, Weak)
+(Abundant, Scarce)
+)
+
+2022/10/03 16:25:46:413: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:25:46:413: Request: PUT New Old
+2022/10/03 16:25:46:413: RESPONSE((New, Old) added successfully)
+
+2022/10/03 16:25:51:355: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:25:51:354: Request: GET New
+2022/10/03 16:25:51:356: RESPONSE(Old)
+
+2022/10/03 16:25:56:416: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:25:56:416: Request: DELETE New
+2022/10/03 16:25:56:416: RESPONSE(Successfully deleted New)
+
+2022/10/03 16:26:00:397: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:26:00:397: Request: GET New
+2022/10/03 16:26:00:398: RESPONSE(New is not present in database.)
+
+2022/10/03 16:26:13:064: Request Received. InetAddress: /127.0.0.1:54599
+2022/10/03 16:26:13:064: Request: GIT mmmmppp nooooo
+2022/10/03 16:26:13:065: RESPONSE(Received malformed request from client!!)
+

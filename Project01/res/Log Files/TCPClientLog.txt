@@ -1,0 +1,43 @@
+
+
+-------------------------------------------------------------------
+2022/10/03 16:20:40:787: Connected to server at localhost/127.0.0.1:1234
+2022/10/03 16:20:40:799: Response: Database Content(Key, Value):
+(Calm, Furious)
+(Answer, Question)
+(Serious, Trivial)
+(Hello, World)
+(Accept, Refuse)
+(Friend, Enemy)
+(Happy, Sad)
+(Possible, Impossible)
+(Inferior, Superior)
+(Expensive, Cheap)
+(Strong, Weak)
+(Abundant, Scarce)
+
+
+2022/10/03 16:20:40:799: Possible commands: PUT/GET/DELETE/QUIT
+
+2022/10/03 16:20:40:800: Command: PUT New Old
+2022/10/03 16:21:34:453: Response: (New, Old) added successfully
+
+2022/10/03 16:21:34:453: Command: GET New
+2022/10/03 16:21:39:427: Response: Old
+
+2022/10/03 16:21:39:428: Command: DELETE New
+2022/10/03 16:21:46:395: Response: Successfully deleted New
+
+2022/10/03 16:21:46:395: Command: PUT SomeInvalidSyntax
+2022/10/03 16:22:13:377: Response: Invalid format for PUT. Expected: PUT <key> <value>
+
+2022/10/03 16:22:13:377: Command: GIT Hello
+2022/10/03 16:22:22:678: Response: Received malformed request from client!!
+
+2022/10/03 16:22:22:678: Command: DELETE New
+2022/10/03 16:22:40:527: Response: New is not present in database
+
+2022/10/03 16:22:40:527: Command: GET Hello
+2022/10/03 16:22:47:733: Response: World
+
+2022/10/03 16:22:47:734: Command: QUIT

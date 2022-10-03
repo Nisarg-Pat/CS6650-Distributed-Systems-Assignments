@@ -1,0 +1,54 @@
+
+
+-------------------------------------------------------------------
+2022/10/03 16:20:29:585: TCPServer listening at port: 1234
+
+2022/10/03 16:20:40:779: Client connected. InetAddress: /127.0.0.1:64317
+
+2022/10/03 16:20:40:795: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:20:40:795: Request: ALL
+2022/10/03 16:20:40:796: RESPONSE(Database Content(Key, Value):
+(Calm, Furious)
+(Answer, Question)
+(Serious, Trivial)
+(Hello, World)
+(Accept, Refuse)
+(Friend, Enemy)
+(Happy, Sad)
+(Possible, Impossible)
+(Inferior, Superior)
+(Expensive, Cheap)
+(Strong, Weak)
+(Abundant, Scarce)
+)
+
+2022/10/03 16:21:34:177: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:21:34:177: Request: PUT New Old
+2022/10/03 16:21:34:452: RESPONSE((New, Old) added successfully)
+
+2022/10/03 16:21:39:426: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:21:39:426: Request: GET New
+2022/10/03 16:21:39:427: RESPONSE(Old)
+
+2022/10/03 16:21:46:393: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:21:46:393: Request: DELETE New
+2022/10/03 16:21:46:394: RESPONSE(Successfully deleted New)
+
+2022/10/03 16:22:13:375: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:22:13:375: Request: PUT SomeInvalidSyntax
+2022/10/03 16:22:13:376: RESPONSE(Invalid format for PUT. Expected: PUT <key> <value>)
+
+2022/10/03 16:22:22:676: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:22:22:676: Request: GIT Hello
+2022/10/03 16:22:22:677: RESPONSE(Received malformed request from client!!)
+
+2022/10/03 16:22:40:525: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:22:40:525: Request: DELETE New
+2022/10/03 16:22:40:526: RESPONSE(New is not present in database)
+
+2022/10/03 16:22:47:732: Request Received. InetAddress: /127.0.0.1:64317
+2022/10/03 16:22:47:732: Request: GET Hello
+2022/10/03 16:22:47:733: RESPONSE(World)
+
+2022/10/03 16:22:53:076: Connection closed with InetAddress: /127.0.0.1:64317
+

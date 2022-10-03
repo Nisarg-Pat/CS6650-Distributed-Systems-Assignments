@@ -1,0 +1,36 @@
+
+
+-------------------------------------------------------------------
+2022/10/03 16:25:33:532: Response: Database Content(Key, Value):
+(Calm, Furious)
+(Answer, Question)
+(Serious, Trivial)
+(Hello, World)
+(Accept, Refuse)
+(Friend, Enemy)
+(Happy, Sad)
+(Possible, Impossible)
+(Inferior, Superior)
+(Expensive, Cheap)
+(Strong, Weak)
+(Abundant, Scarce)
+
+
+2022/10/03 16:25:33:537: Possible commands: PUT/GET/DELETE/QUIT
+
+2022/10/03 16:25:33:538: Command: PUT New Old
+2022/10/03 16:25:46:414: Response: (New, Old) added successfully
+
+2022/10/03 16:25:46:414: Command: GET New
+2022/10/03 16:25:51:357: Response: Old
+
+2022/10/03 16:25:51:357: Command: DELETE New
+2022/10/03 16:25:56:417: Response: Successfully deleted New
+
+2022/10/03 16:25:56:418: Command: GET New
+2022/10/03 16:26:00:399: Response: New is not present in database.
+
+2022/10/03 16:26:00:400: Command: GIT mmmmppp nooooo
+2022/10/03 16:26:13:066: Response: Received malformed request from client!!
+
+2022/10/03 16:26:13:066: Command: QUIT
