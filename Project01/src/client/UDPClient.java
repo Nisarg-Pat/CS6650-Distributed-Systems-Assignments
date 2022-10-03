@@ -20,6 +20,7 @@ public class UDPClient extends AbstractClient {
     datagramSocket.setSoTimeout(TIMEOUT);
     this.addr = addr;
     this.port = port;
+    clientLog.createFile("UDPClientLog.txt");
   }
 
   @Override

@@ -1,18 +1,24 @@
-package client;
+package util;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class ClientLog {
+public class Log {
 
   File file;
 
-  public ClientLog() throws IOException {
-    file = new File("ClientLog.txt");
+  public Log() throws IOException {
+    file = null;
+  }
+
+  public void createFile(String s) throws IOException {
+    file = new File(s);
+    logOnly("\n\n-------------------------------------------------------------------");
   }
 
   public void log(String s) throws IOException {
+    s = DataUtils.getCurrentTime()+": "+s;
     FileWriter writer = new FileWriter(file, true);
     System.out.print(s);
     writer.write(s);
@@ -20,6 +26,7 @@ public class ClientLog {
   }
 
   public void logln(String s) throws IOException {
+    s = DataUtils.getCurrentTime()+": "+s;
     FileWriter writer = new FileWriter(file, true);
     System.out.println(s);
     writer.write(s+"\n");

@@ -16,9 +16,10 @@ public class UDPServer extends AbstractServer{
 
   DatagramSocket datagramSocket;
 
-  UDPServer(int port) throws SocketException {
+  UDPServer(int port) throws IOException {
     super(port);
     datagramSocket = new DatagramSocket(port);
+    serverLog.createFile("UCPServerLog.txt");
   }
 
   @Override

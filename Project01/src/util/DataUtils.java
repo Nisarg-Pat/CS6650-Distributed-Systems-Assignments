@@ -1,5 +1,7 @@
 package util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
 public class DataUtils {
@@ -40,5 +42,11 @@ public class DataUtils {
   public static String decode(String input) {
     byte[] bytes = Base64.getDecoder().decode(input.getBytes());
     return new String(bytes);
+  }
+
+  public static String getCurrentTime() {
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss:SS");
+    LocalDateTime now = LocalDateTime.now();
+    return dtf.format(now);
   }
 }

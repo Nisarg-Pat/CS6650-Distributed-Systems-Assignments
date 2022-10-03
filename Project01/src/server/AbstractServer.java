@@ -5,22 +5,28 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import util.DataUtils;
+import util.Log;
+
 public abstract class AbstractServer {
 
   int port;
   KeyValueDB db;
 
-  AbstractServer(int port) {
+  public Log serverLog;
+
+  AbstractServer(int port) throws IOException {
     this.port = port;
     this.db = new KeyValueDB();
+    serverLog = new Log();
   }
 
   public abstract void execute() throws IOException;
 
   public String createInputString(InetAddress addr, int port, String input) {
     StringBuffer sb = new StringBuffer();
-    sb.append("Request Received. InetAddress: ").append(getAddress(addr, port))
-            .append("\nRequest: ").append(input);
+    sb.append("Request Received.").append(getAddress(addr, port)).append("\n")
+            .append(DataUtils.getCurrentTime()).append(": Request: ").append(input);
     return sb.toString();
   }
 

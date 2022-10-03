@@ -18,6 +18,9 @@ public class TCPClient extends AbstractClient {
   public TCPClient(InetAddress address, int port) throws IOException {
     super();
     this.socket = new Socket(address, port);
+    clientLog.createFile("TCPClientLog.txt");
+
+    clientLog.logln(String.format("Connected to server at %s:%s", address, port));
   }
 
   @Override
@@ -27,7 +30,6 @@ public class TCPClient extends AbstractClient {
 
     out.println(input);
     out.flush();
-
 
     long timeoutTime = System.currentTimeMillis() + TIMEOUT;
     while(!br.ready()) {
