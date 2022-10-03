@@ -32,20 +32,21 @@ public class TCPClient extends AbstractClient {
     out.flush();
 
     long timeoutTime = System.currentTimeMillis() + TIMEOUT;
-    while(!br.ready()) {
+    while (!br.ready()) {
       long currentTime = System.currentTimeMillis();
-      if(currentTime >= timeoutTime) {
-        clientLog.logln("TIMEOUT!");
+      if (currentTime >= timeoutTime) {
+        clientLog.logln("Server Timeout! Please try requesting again\n");
         return;
       }
     }
 
     String response = br.readLine();
     String output = getOutput(response);
-    if(output.isEmpty()) {
-      clientLog.logln("Malformed Response!");
+    if (output.isEmpty()) {
+      clientLog.logln(String.format("Received malformed response from server %s:%s\n",
+              socket.getInetAddress(), socket.getPort()));
       return;
     }
-    clientLog.logln("Response: " + output+"\n");
+    clientLog.logln("Response: " + output + "\n");
   }
 }

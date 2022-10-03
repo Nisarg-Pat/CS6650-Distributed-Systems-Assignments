@@ -36,14 +36,15 @@ public class UDPClient extends AbstractClient {
     try {
       datagramSocket.receive(response);
     } catch (SocketTimeoutException e) {
-      clientLog.logln("TIMEOUT\n");
+      clientLog.logln("Server Timeout! Please try requesting again\n");
       return;
     }
 
     String res = new String(response.getData()).substring(0, response.getLength());
     String output = getOutput(res);
     if (output.isEmpty()) {
-      clientLog.logln("Malformed Response!");
+      clientLog.logln(String.format("Received unsolicited response of length %d from server %s:%s\n",
+              response.getLength(), response.getAddress(), response.getPort()));
       return;
     }
     //output = DataUtils.decode(output);

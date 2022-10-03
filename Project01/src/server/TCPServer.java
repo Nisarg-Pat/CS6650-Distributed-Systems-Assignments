@@ -17,7 +17,7 @@ public class TCPServer extends AbstractServer {
   }
 
   public void execute() throws IOException {
-    serverLog.logln("TCPServer listening at port: " + port+"\n");
+    serverLog.logln("TCPServer listening at port: " + port + "\n");
     while (true) {
       Socket socket = serverSocket.accept();
       serverLog.logln("Client connected. " + getAddress(socket.getInetAddress(), socket.getPort()) + "\n");
@@ -28,14 +28,14 @@ public class TCPServer extends AbstractServer {
         while ((input = br.readLine()) != null) {
           serverLog.logln(createInputString(socket.getInetAddress(), socket.getPort(), input));
           String output = getOutput(input);
-          serverLog.logln(output+"\n");
+          serverLog.logln(output + "\n");
           out.println(output);
           out.flush();
         }
       } catch (Exception e) {
         //Empty catch
       }
-      serverLog.logln("Connection closed with " + socket.getInetAddress() + "\n");
+      serverLog.logln("Connection closed with " + getAddress(socket.getInetAddress(), socket.getPort()) + "\n");
     }
   }
 }

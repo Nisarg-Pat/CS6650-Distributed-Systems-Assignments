@@ -33,4 +33,28 @@ public class KeyValueDB {
     map.remove(key);
     return true;
   }
+
+  public void populate() {
+    map.put("Hello", "World");
+    map.put("Accept", "Refuse");
+    map.put("Answer", "Question");
+    map.put("Abundant", "Scarce");
+    map.put("Calm", "Furious");
+    map.put("Expensive", "Cheap");
+    map.put("Friend", "Enemy");
+    map.put("Happy", "Sad");
+    map.put("Inferior", "Superior");
+    map.put("Possible", "Impossible");
+    map.put("Serious", "Trivial");
+    map.put("Strong", "Weak");
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for(String key: map.keySet()) {
+      sb.append("Key=").append(key).append(" Value=").append(map.get(key)).append("\n");
+    }
+    return sb.toString();
+  }
 }

@@ -18,14 +18,15 @@ public abstract class AbstractServer {
   AbstractServer(int port) throws IOException {
     this.port = port;
     this.db = new KeyValueDB();
-    serverLog = new Log();
+    this.db.populate();
+    this.serverLog = new Log();
   }
 
   public abstract void execute() throws IOException;
 
   public String createInputString(InetAddress addr, int port, String input) {
     StringBuffer sb = new StringBuffer();
-    sb.append("Request Received.").append(getAddress(addr, port)).append("\n")
+    sb.append("Request Received. ").append(getAddress(addr, port)).append("\n")
             .append(DataUtils.getCurrentTime()).append(": Request: ").append(input);
     return sb.toString();
   }
@@ -83,7 +84,7 @@ public abstract class AbstractServer {
           return "Invalid format for DELETE. Expected: DELETE <key>";
         }
       default:
-        return "Invalid command: "+command+". Possible commands: PUT/GET/DELETE/QUIT";
+        return "Received malformed request from client!!";
     }
   }
 
