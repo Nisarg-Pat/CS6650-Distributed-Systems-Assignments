@@ -11,15 +11,26 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class TCPClient extends AbstractClient {
+/**
+ * Access protected
+ * Class for TCP Client
+ */
+class TCPClient extends AbstractClient {
 
   Socket socket;
 
+  /**
+   * Constructor for UDP Client
+   * @param address InetAddress of the server
+   * @param port server port
+   * @throws IOException
+   */
   public TCPClient(InetAddress address, int port) throws IOException {
     super();
     this.socket = new Socket(address, port);
-    clientLog.createFile("TCPClientLog.txt");
 
+    //Creating a log file
+    clientLog.createFile("TCPClientLog.txt");
     clientLog.logln(String.format("Connected to server at %s:%s", address, port));
   }
 
@@ -28,9 +39,11 @@ public class TCPClient extends AbstractClient {
     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
     BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+    // Sending Request to the Server using DatagramPacket
     out.println(input);
     out.flush();
 
+    // Checking for connection timeout
     long timeoutTime = System.currentTimeMillis() + TIMEOUT;
     while (!br.ready()) {
       long currentTime = System.currentTimeMillis();
@@ -40,12 +53,14 @@ public class TCPClient extends AbstractClient {
       }
     }
 
+    // Receiving the response
     StringBuilder response = new StringBuilder();
     response.append(br.readLine());
     while (br.ready()) {
       response.append("\n").append(br.readLine());
     }
-//    String response = br.readLine();
+
+    //Getting output from the response
     String output = getOutput(response.toString());
     if (output.isEmpty()) {
       clientLog.logln(String.format("Received malformed response from server %s:%s\n",
