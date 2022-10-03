@@ -9,16 +9,20 @@ public abstract class AbstractClient {
 
   public static final int TIMEOUT = 10000; //in milliseconds (= 10 sec)
 
+  public ClientLog clientLog;
+
   public AbstractClient() throws IOException {
     scanner = new Scanner(System.in);
+    clientLog = new ClientLog();
   }
 
   public void execute() throws IOException {
-    System.out.println("Possible commands: PUT/GET/DELETE/QUIT");
+    clientLog.logln("Possible commands: PUT/GET/DELETE/QUIT");
     String input = "";
     while (true) {
-      System.out.print("Command: ");
+      clientLog.log("Command: ");
       input = scanner.nextLine();
+      clientLog.logOnly(input);
       if (input.equals("QUIT")) {
         break;
       }

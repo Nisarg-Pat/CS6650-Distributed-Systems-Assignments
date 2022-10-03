@@ -35,18 +35,17 @@ public class UDPClient extends AbstractClient {
     try {
       datagramSocket.receive(response);
     } catch (SocketTimeoutException e) {
-      System.out.println("TIMEOUT\n");
+      clientLog.logln("TIMEOUT\n");
       return;
     }
 
     String res = new String(response.getData()).substring(0, response.getLength());
     String output = getOutput(res);
-    if(output.isEmpty()) {
-      System.out.println("Malformed Response!");
+    if (output.isEmpty()) {
+      clientLog.logln("Malformed Response!");
       return;
     }
     //output = DataUtils.decode(output);
-    System.out.println("Response: " + output);
-    System.out.println();
+    clientLog.logln("Response: " + output + "\n");
   }
 }

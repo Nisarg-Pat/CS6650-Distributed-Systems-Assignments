@@ -33,7 +33,7 @@ public class TCPClient extends AbstractClient {
     while(!br.ready()) {
       long currentTime = System.currentTimeMillis();
       if(currentTime >= timeoutTime) {
-        System.out.println("TIMEOUT!");
+        clientLog.logln("TIMEOUT!");
         return;
       }
     }
@@ -41,10 +41,9 @@ public class TCPClient extends AbstractClient {
     String response = br.readLine();
     String output = getOutput(response);
     if(output.isEmpty()) {
-      System.out.println("Malformed Response!");
+      clientLog.logln("Malformed Response!");
       return;
     }
-    System.out.println("Response: " + output);
-    System.out.println();
+    clientLog.logln("Response: " + output+"\n");
   }
 }
