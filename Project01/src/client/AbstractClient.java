@@ -19,6 +19,7 @@ public abstract class AbstractClient {
   }
 
   public void execute() throws IOException {
+    request("ALL");
     clientLog.logln("Possible commands: PUT/GET/DELETE/QUIT\n");
     String input = "";
     while (true) {

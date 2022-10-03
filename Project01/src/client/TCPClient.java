@@ -40,8 +40,13 @@ public class TCPClient extends AbstractClient {
       }
     }
 
-    String response = br.readLine();
-    String output = getOutput(response);
+    StringBuilder response = new StringBuilder();
+    response.append(br.readLine());
+    while (br.ready()) {
+      response.append("\n").append(br.readLine());
+    }
+//    String response = br.readLine();
+    String output = getOutput(response.toString());
     if (output.isEmpty()) {
       clientLog.logln(String.format("Received malformed response from server %s:%s\n",
               socket.getInetAddress(), socket.getPort()));

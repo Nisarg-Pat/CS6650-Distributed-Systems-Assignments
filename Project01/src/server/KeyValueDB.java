@@ -53,7 +53,7 @@ public class KeyValueDB {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     for(String key: map.keySet()) {
-      sb.append("Key=").append(key).append(" Value=").append(map.get(key)).append("\n");
+      sb.append("(").append(key).append(", ").append(map.get(key)).append(")\n");
     }
     return sb.toString();
   }

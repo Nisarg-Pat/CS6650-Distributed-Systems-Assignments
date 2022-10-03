@@ -43,6 +43,9 @@ public abstract class AbstractServer {
   }
 
   public String processRequest(String input) {
+    if(input.equals("ALL")) {
+      return "Database Content(Key, Value):\n"+ db.toString();
+    }
     String[] data = input.split(" ");
     String command = data[0];
     switch (command) {
@@ -99,5 +102,4 @@ public abstract class AbstractServer {
   private boolean checkPut(String[] data) {
     return data.length == 3;
   }
-
 }
