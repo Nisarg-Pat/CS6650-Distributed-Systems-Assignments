@@ -6,8 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
-import util.DataUtils;
-
 /**
  * Access: Package-Protected
  * Class for UDP Client
@@ -20,6 +18,7 @@ public class UDPClient extends AbstractClient {
 
   /**
    * Constructor for UDP Client
+   *
    * @param addr InetAddress of the server
    * @param port server port
    * @throws IOException

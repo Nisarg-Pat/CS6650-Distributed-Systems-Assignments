@@ -9,7 +9,7 @@ import util.Log;
  * Visibility: Package Private
  * Abstract class for Client implementing common methods between both types of clients
  */
-abstract class AbstractClient implements Client{
+abstract class AbstractClient implements Client {
 
   protected final Scanner scanner;
 

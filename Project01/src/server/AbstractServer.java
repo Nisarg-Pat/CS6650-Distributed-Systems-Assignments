@@ -10,7 +10,7 @@ import util.Log;
  * Visibility: Package Private
  * Abstract class for Server implementing common methods between both types of servers
  */
-abstract class AbstractServer implements Server{
+abstract class AbstractServer implements Server {
 
   protected final int port;
   protected final KeyValueDB db;

@@ -1,12 +1,8 @@
 package client;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -21,8 +17,9 @@ class TCPClient extends AbstractClient {
 
   /**
    * Constructor for TCP Client
+   *
    * @param address InetAddress of the server
-   * @param port server port
+   * @param port    server port
    * @throws IOException
    */
   public TCPClient(InetAddress address, int port) throws IOException {

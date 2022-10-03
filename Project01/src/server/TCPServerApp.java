@@ -7,13 +7,14 @@ import util.DataUtils;
 /**
  * TCP Server Application
  */
-public class TCPServerApp{
+public class TCPServerApp {
 
   /**
    * Main Method to start UDP Client
+   *
    * @param args Required args: <port>
    */
-  public static void main(String[] args){
+  public static void main(String[] args) {
     //Validates the command line arguments
     DataUtils.validateServerArguments(args);
 

@@ -12,6 +12,7 @@ public class UDPClientApp {
 
   /**
    * Main Method to start UDP Client
+   *
    * @param args Required args: <hostname or IP> <port>
    */
   public static void main(String[] args) {
