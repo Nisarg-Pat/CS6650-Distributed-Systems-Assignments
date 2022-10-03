@@ -28,6 +28,16 @@ public class TCPClient extends AbstractClient {
     out.println(input);
     out.flush();
 
+
+    long timeoutTime = System.currentTimeMillis() + TIMEOUT;
+    while(!br.ready()) {
+      long currentTime = System.currentTimeMillis();
+      if(currentTime >= timeoutTime) {
+        System.out.println("TIMEOUT!");
+        return;
+      }
+    }
+
     String temp = br.readLine();
     System.out.println("Server Response: " + temp);
     System.out.println();

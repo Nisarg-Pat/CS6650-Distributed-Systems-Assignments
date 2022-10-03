@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 import util.DataUtils;
 
@@ -16,6 +17,7 @@ public class UDPClient extends AbstractClient {
   public UDPClient(InetAddress addr, int port) throws IOException {
     super();
     datagramSocket = new DatagramSocket();
+    datagramSocket.setSoTimeout(TIMEOUT);
     this.addr = addr;
     this.port = port;
   }
@@ -29,7 +31,14 @@ public class UDPClient extends AbstractClient {
 
     buffer = new byte[1000];
     DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-    datagramSocket.receive(response);
+
+    try {
+      datagramSocket.receive(response);
+    } catch (SocketTimeoutException e) {
+      System.out.println("TIMEOUT\n");
+      return;
+    }
+
     String output = new String(response.getData()).substring(0, response.getLength());
     //output = DataUtils.decode(output);
     System.out.println("Server Response: " + output);

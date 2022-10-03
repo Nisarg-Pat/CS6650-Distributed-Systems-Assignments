@@ -5,7 +5,10 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public abstract class AbstractClient {
-  Scanner scanner;
+
+  private final Scanner scanner;
+
+  public static final int TIMEOUT = 10000; //in milliseconds (= 10 sec)
 
   public AbstractClient() throws IOException {
     scanner = new Scanner(System.in);
