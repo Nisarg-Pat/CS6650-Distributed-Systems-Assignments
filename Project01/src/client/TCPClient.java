@@ -17,7 +17,7 @@ import java.net.Socket;
  */
 class TCPClient extends AbstractClient {
 
-  Socket socket;
+  private final Socket socket;
 
   /**
    * Constructor for TCP Client

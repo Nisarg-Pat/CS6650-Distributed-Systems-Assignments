@@ -74,7 +74,6 @@ Client can perform one of the following commands on the terminal:
 4) QUIT - Closes the connection between client and server in TCP. Client Application ends (Both).
 5) There is one more special command: ALL - This gives all the key-value pairs present in the 
    database. This is called once everytime a new instance of client application is created.
-6) 
 
 ## Examples and Sample Images
 
@@ -89,7 +88,7 @@ is present in the res/Screenshots ans res/Log Files folders.
    response is shown in UDPClient.
 
 ## Additional Information
-1) The server response is of the following format: RESPONSE(<output>), where <ouput> is the text 
+1) The server response is of the following format: RESPONSE(\<output\>), where <ouput> is the text 
    response from the server.
 2) Maximum of 4 different log files are created: TCPClientLog.txt, TCPServerLog.txt, 
    UDPClientLog.txt, UDPServerLog.txt. Each file contain logs of corresponding applications and are

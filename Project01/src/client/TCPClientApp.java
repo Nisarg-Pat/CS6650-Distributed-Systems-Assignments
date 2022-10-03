@@ -24,7 +24,7 @@ public class TCPClientApp {
       int port = Integer.parseInt(args[1]);
 
       //Creating a TCP Client and calling execute
-      AbstractClient client = new TCPClient(address, port);
+      Client client = new TCPClient(address, port);
       client.execute();
     } catch (IOException e) {
       System.out.println(e.getMessage());

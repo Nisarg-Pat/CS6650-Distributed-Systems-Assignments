@@ -12,10 +12,11 @@ import java.net.Socket;
  * Class for TCP Server
  */
 class TCPServer extends AbstractServer {
-  ServerSocket serverSocket;
+  private final ServerSocket serverSocket;
 
   /**
    * Constructor for TCP Server
+   *
    * @param port Port at which server should listen
    * @throws IOException
    */

@@ -14,9 +14,9 @@ import util.DataUtils;
  */
 public class UDPClient extends AbstractClient {
 
-  DatagramSocket datagramSocket;
-  InetAddress addr;
-  int port;
+  private final DatagramSocket datagramSocket;
+  private final InetAddress addr;
+  private final int port;
 
   /**
    * Constructor for UDP Client

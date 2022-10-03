@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public class KeyValueDB {
 
-  Map<String, String> map;
+  private final Map<String, String> map;
 
   /**
    * Constructor for the database

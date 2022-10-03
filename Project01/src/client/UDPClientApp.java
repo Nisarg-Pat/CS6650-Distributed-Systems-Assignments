@@ -24,7 +24,7 @@ public class UDPClientApp {
       int port = Integer.parseInt(args[1]);
 
       //Creating a UDP Client and calling execute
-      AbstractClient client = new UDPClient(address, port);
+      Client client = new UDPClient(address, port);
       client.execute();
     } catch (IOException e) {
       System.out.println(e.getMessage());

@@ -1,0 +1,3 @@
+Assigment Overview
+
+This assignment consisted of creating two sets of applications using two different L4 communication protocols namely TCP and UDP. The purpose of this assign

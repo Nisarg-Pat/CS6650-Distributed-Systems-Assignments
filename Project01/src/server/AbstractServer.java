@@ -7,14 +7,15 @@ import util.DataUtils;
 import util.Log;
 
 /**
+ * Visibility: Package Private
  * Abstract class for Server implementing common methods between both types of servers
  */
-public abstract class AbstractServer {
+abstract class AbstractServer implements Server{
 
-  int port;
-  KeyValueDB db;
+  protected final int port;
+  protected final KeyValueDB db;
 
-  public Log serverLog;
+  protected final Log serverLog;
 
   /**
    * Constructor for AbstractServer
@@ -29,21 +30,7 @@ public abstract class AbstractServer {
     this.serverLog = new Log();
   }
 
-  /**
-   * Starts a server, listening at port based on the protocol it is created.
-   *
-   * @throws IOException
-   */
-  public abstract void start() throws IOException;
-
-  /**
-   * Formats the request string in readable form.
-   *
-   * @param addr  The InetAddress of the client
-   * @param port  The port number of the client
-   * @param input The input request from the client
-   * @return Request string in readable form
-   */
+  @Override
   public String createInputString(InetAddress addr, int port, String input) {
     StringBuffer sb = new StringBuffer();
     sb.append("Request Received. ").append(getAddress(addr, port)).append("\n")
@@ -51,23 +38,12 @@ public abstract class AbstractServer {
     return sb.toString();
   }
 
-  /**
-   * Formats the client InetAddress and port
-   *
-   * @param addr The InetAddress of the client
-   * @param port The port number of the client
-   * @return The client details in String format
-   */
+  @Override
   public String getAddress(InetAddress addr, int port) {
     return String.format("InetAddress: %s:%s", addr, port);
   }
 
-  /**
-   * Process the input and returns the response to be sent back to client
-   *
-   * @param input The client input(request)
-   * @return Response String to be sent back to client
-   */
+  @Override
   public String getOutput(String input) {
     StringBuilder sb = new StringBuilder();
     sb.append("RESPONSE").append("(");
@@ -75,16 +51,7 @@ public abstract class AbstractServer {
     return sb.toString();
   }
 
-  /**
-   * Processes Request made by client. Possible requests:
-   * ALL - Gives the list of all key-value pair in the database
-   * PUT <key> <value> - Puts a key-value pair in database
-   * GET <key> - Gets the value for the key if present
-   * DELETE <key> - Deletes the key
-   *
-   * @param input Request by client
-   * @return Server output of the request
-   */
+  @Override
   public String processRequest(String input) {
     if (input.equals("ALL")) {
       //Gives list of all key-value pair in the database

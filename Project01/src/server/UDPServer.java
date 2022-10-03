@@ -18,7 +18,7 @@ import util.DataUtils;
  */
 class UDPServer extends AbstractServer{
 
-  DatagramSocket datagramSocket;
+  private final DatagramSocket datagramSocket;
 
   /**
    * Constructor for UDP Server
