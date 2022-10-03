@@ -24,8 +24,7 @@ public class UDPServer extends AbstractServer{
 
   @Override
   public void execute() throws IOException {
-    System.out.println("UDPServer listening at port: " + port);
-    System.out.println();
+    serverLog.logln("UDPServer listening at port: " + port+ "\n");
     while (true) {
       byte[] buffer = new byte[1000];
       DatagramPacket request = new DatagramPacket(buffer, buffer.length);
@@ -33,10 +32,9 @@ public class UDPServer extends AbstractServer{
       String input = new String(request.getData()).substring(0, request.getLength());
       //input = DataUtils.decode(input);
 
-      System.out.println(createInputString(request.getAddress(), request.getPort(), input));
+      serverLog.logln(createInputString(request.getAddress(), request.getPort(), input));
       String output = getOutput(input);
-      System.out.println(output);
-      System.out.println();
+      serverLog.logln(output+"\n");
 
       //byte[] outputByte = DataUtils.encode(output).getBytes();
       byte[] outputByte = output.getBytes();
