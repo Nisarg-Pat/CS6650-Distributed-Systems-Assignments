@@ -12,7 +12,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 /**
- * Access protected
+ * Access: pakage-protected
  * Class for TCP Client
  */
 class TCPClient extends AbstractClient {
@@ -20,7 +20,7 @@ class TCPClient extends AbstractClient {
   Socket socket;
 
   /**
-   * Constructor for UDP Client
+   * Constructor for TCP Client
    * @param address InetAddress of the server
    * @param port server port
    * @throws IOException

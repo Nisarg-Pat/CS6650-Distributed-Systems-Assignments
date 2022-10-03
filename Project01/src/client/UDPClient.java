@@ -9,7 +9,7 @@ import java.net.SocketTimeoutException;
 import util.DataUtils;
 
 /**
- * Access: Protected
+ * Access: Package-Protected
  * Class for UDP Client
  */
 public class UDPClient extends AbstractClient {

@@ -27,7 +27,7 @@ public class UDPClientApp {
       AbstractClient client = new UDPClient(address, port);
       client.execute();
     } catch (IOException e) {
-      System.out.println(e);
+      System.out.println(e.getMessage());
     }
 
   }
