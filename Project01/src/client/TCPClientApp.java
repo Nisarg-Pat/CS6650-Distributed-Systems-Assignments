@@ -1,20 +1,19 @@
 package client;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import util.DataUtils;
 
-public class TCPClientApp{
-
-  public static String host;
-  public static int port;
-  public static AbstractClient client;
+public class TCPClientApp {
 
   public static void main(String[] args) throws IOException {
     DataUtils.validateClientArguments(args);
-    host = args[0];
-    port = Integer.parseInt(args[1]);
-    client = new TCPClient(host, port);
+
+    InetAddress address = InetAddress.getByName(args[0]);
+    int port = Integer.parseInt(args[1]);
+
+    AbstractClient client = new TCPClient(address, port);
     client.execute();
   }
 }

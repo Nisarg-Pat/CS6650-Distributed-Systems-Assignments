@@ -13,10 +13,10 @@ public class UDPClient extends AbstractClient {
   InetAddress addr;
   int port;
 
-  public UDPClient(String host, int port) throws IOException {
+  public UDPClient(InetAddress addr, int port) throws IOException {
     super();
     datagramSocket = new DatagramSocket();
-    this.addr = InetAddress.getByName(host);
+    this.addr = addr;
     this.port = port;
   }
 
