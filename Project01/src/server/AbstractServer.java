@@ -28,6 +28,13 @@ public abstract class AbstractServer {
     return String.format("InetAddress: %s:%s", addr, port);
   }
 
+  public String getOutput(String input) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("RESPONSE").append("(");
+    sb.append(processRequest(input)).append(")");
+    return sb.toString();
+  }
+
   public String processRequest(String input) {
     String[] data = input.split(" ");
     String command = data[0];
@@ -40,22 +47,22 @@ public abstract class AbstractServer {
           if (res) {
             return String.format("(%s, %s) added successfully", key, value);
           } else {
-            return String.format("Cannot put (%s, %s) in database.", key, value);
+            return String.format("Cannot put (%s, %s) in database. Please check the key and value.", key, value);
           }
         } else {
-          return "Invalid format for PUT. Expected: PUT key value";
+          return "Invalid format for PUT. Expected: PUT <key> <value>";
         }
       case "GET":
         if (checkGet(data)) {
           String key = data[1];
           String res = db.get(key);
           if (res.equals("")) {
-            return key + " is not present in database";
+            return key + " is not present in database.";
           } else {
             return res;
           }
         } else {
-          return "Invalid format for GET. Expected: GET key";
+          return "Invalid format for GET. Expected: GET <key>";
         }
       case "DELETE":
         if (checkDelete(data)) {
@@ -67,10 +74,10 @@ public abstract class AbstractServer {
             return key + " is not present in database";
           }
         } else {
-          return "Invalid format for DELETE. Expected: DELETE key";
+          return "Invalid format for DELETE. Expected: DELETE <key>";
         }
       default:
-        return "Invalid command!";
+        return "Invalid command: "+command+". Possible commands: PUT/GET/DELETE/QUIT";
     }
   }
 

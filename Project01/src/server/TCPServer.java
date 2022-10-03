@@ -28,8 +28,8 @@ public class TCPServer extends AbstractServer {
       try {
         while ((input = br.readLine()) != null) {
           System.out.println(createInputString(socket.getInetAddress(), socket.getPort(), input));
-          String output = processRequest(input);
-          System.out.println("Response: " + output);
+          String output = getOutput(input);
+          System.out.println(output);
           System.out.println();
           out.println(output);
           out.flush();

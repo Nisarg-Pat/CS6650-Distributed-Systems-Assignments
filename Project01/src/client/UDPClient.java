@@ -23,7 +23,7 @@ public class UDPClient extends AbstractClient {
   }
 
   @Override
-  public void send(String input) throws IOException {
+  public void request(String input) throws IOException {
     //byte[] buffer = DataUtils.encode(input).getBytes();
     byte[] buffer = input.getBytes();
     DatagramPacket request = new DatagramPacket(buffer, input.length(), addr, port);
@@ -39,9 +39,14 @@ public class UDPClient extends AbstractClient {
       return;
     }
 
-    String output = new String(response.getData()).substring(0, response.getLength());
+    String res = new String(response.getData()).substring(0, response.getLength());
+    String output = getOutput(res);
+    if(output.isEmpty()) {
+      System.out.println("Malformed Response!");
+      return;
+    }
     //output = DataUtils.decode(output);
-    System.out.println("Server Response: " + output);
+    System.out.println("Response: " + output);
     System.out.println();
   }
 }

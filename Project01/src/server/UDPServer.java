@@ -33,8 +33,8 @@ public class UDPServer extends AbstractServer{
       //input = DataUtils.decode(input);
 
       System.out.println(createInputString(request.getAddress(), request.getPort(), input));
-      String output = processRequest(input);
-      System.out.println("Response: " + output);
+      String output = getOutput(input);
+      System.out.println(output);
       System.out.println();
 
       //byte[] outputByte = DataUtils.encode(output).getBytes();

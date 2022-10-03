@@ -21,7 +21,7 @@ public class TCPClient extends AbstractClient {
   }
 
   @Override
-  public void send(String input) throws IOException {
+  public void request(String input) throws IOException {
     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
     BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -38,8 +38,13 @@ public class TCPClient extends AbstractClient {
       }
     }
 
-    String temp = br.readLine();
-    System.out.println("Server Response: " + temp);
+    String response = br.readLine();
+    String output = getOutput(response);
+    if(output.isEmpty()) {
+      System.out.println("Malformed Response!");
+      return;
+    }
+    System.out.println("Response: " + output);
     System.out.println();
   }
 }
