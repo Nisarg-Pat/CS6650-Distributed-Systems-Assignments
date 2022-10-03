@@ -45,7 +45,7 @@ public class DataUtils {
   }
 
   public static String getCurrentTime() {
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss:SS");
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss:SSS");
     LocalDateTime now = LocalDateTime.now();
     return dtf.format(now);
   }
