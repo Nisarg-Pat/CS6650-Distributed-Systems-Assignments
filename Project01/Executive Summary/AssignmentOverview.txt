@@ -1,3 +1,6 @@
 Assigment Overview
 
-This assignment consisted of creating two sets of applications using two different L4 communication protocols namely TCP and UDP. The purpose of this assign
+This assignment consisted of creating two sets of applications using two different L4 communication protocols namely TCP and UDP. The purpose of this assign was to get the basic understanding of how complex Client and Server applications are implemented and hosted in real world applications along with how some of the issues that could occur during the connection are handled. Creating a simple single threaded server and looking at the problems occurring with it helps to realize the importance of concurrency in a complex server that would get hundreds and thousands of requests every second. Since this was just a basic representation, adding complex features would bring it closer and closer to how real-world applications work, improving the scope of this project.
+
+
+It is also necessary to share data between different instances of server applications which was also not implemented in this project.

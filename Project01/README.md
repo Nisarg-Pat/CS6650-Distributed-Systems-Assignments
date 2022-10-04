@@ -40,27 +40,33 @@ These are the features common to the server applications:
 
 
 ## How to Run
-//TODO
-1) The res/ folder contains a Project05.jar file which can be run directly in IntelliJ or Eclipse
-   Ide. The following command line arguments are required to play in Console mode:
-    * rows: Number of rows in the dungeon. Should be at least 6.
-    * columns: Number of Columns in the dungeon. Should be at least 6.
-    * isWrapped: Whether the dungeon is wrapped around its end
-    * degree: The degree of interconnectivity for the dungeon.
-    * percentage: The percentage of caves having treasure in it. Should be between 0 and 100.
-    * numOtyughs: Number of Otyughs in the dungeon. Should be at least 1.
-2) The arguments should be in this specific order: rows columns isWrapped degree percentage
-   numOtyughs
-3) Use the following command for console mode: java -jar Project05.jar rows columns isWrapped degree
-   percentage numOtyughs.
-4) example-> java -jar Project05.jar 6 8 false 10 50 10
-5) Use the following command for GUI mode from the main folder: java -jar res\Project05.jar NOTE:
-   Due to the dependencies on Images and Sounds, it is required to run the command from the base
-   folder and not res folder. Calling Project05.jar from res folder will not work as it will not
-   load images and sounds.
+Follow these steps to run the applications using docker:
+1) Open the src folder in Terminal.
+   > $ cd src
+2) Run the deploy.sh bash files to create docker images
+   > $ ./deploy.sh
+3) Run the TCP/UDP server application using run_server.sh bash file with (tcp/udp) 
+   and port number as arguments.
+   > $ ./run_server.sh tcp 1111
+   > 
+   > Or
+   > 
+   > $ ./run_server.sh udp 5555
+4) Run the TCP/UDP client application using run_client.sh bash file with (tcp/udp), server-container-name,
+   and port number as arguments.
+   > $ ./run_client.sh tcp my-tcp-server 1111
+   >
+   > Or
+   >
+   > $ ./run_client.sh udp my-udp-server 5555
+5) The server and client are ready to communicate.
+
+Note: If any of the bash files does not execute, try using bash before ./*.sh
+> $ bash ./deploy.sh
+
 
 ## How to Use
-Once client is started, the list of key-value pairs present in the server is shown in the console.
+Once client has started, the list of key-value pairs present in the server is shown in the console.
 Client can perform one of the following commands on the terminal:
 1) PUT \<key\> \<value\> - Creates a new key-value pair on the server database.
    
