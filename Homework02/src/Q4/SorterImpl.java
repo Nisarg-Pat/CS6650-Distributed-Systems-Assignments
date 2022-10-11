@@ -1,9 +1,10 @@
 package Q4;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 
-public class SorterImpl implements Sorter {
+public class SorterImpl extends UnicastRemoteObject implements Sorter  {
 
   protected SorterImpl() throws RemoteException {
     super();

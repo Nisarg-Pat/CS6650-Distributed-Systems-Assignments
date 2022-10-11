@@ -8,8 +8,8 @@ public class SortingServer {
 
   public static void main(String[] args) {
     try {
-      Sorter sorter = new SorterImpl();
-      Sorter stubSorter = (Sorter) UnicastRemoteObject.exportObject(sorter, 0);
+      SorterImpl sorter = new SorterImpl();
+//      Sorter stubSorter = (Sorter) UnicastRemoteObject.exportObject(sorter, 0);
       Registry registry = LocateRegistry.getRegistry();
       registry.bind("SortingService", sorter);
     } catch (Exception e) {

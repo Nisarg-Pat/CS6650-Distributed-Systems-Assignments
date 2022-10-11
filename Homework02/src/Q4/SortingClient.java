@@ -10,8 +10,7 @@ import java.rmi.registry.Registry;
 public class SortingClient {
   public static void main(String[] args) {
     try {
-      Registry registry = LocateRegistry.getRegistry();
-      Sorter sorter = (Sorter) registry.lookup("SortingService");
+      Sorter sorter = (Sorter) Naming.lookup("rmi://localhost:1099/SortingService");
       int[] arr = new int[]{3, 5, 8, 6, 7, 9, 4, 2, 1};
       printArray(sorter.sort(arr));
     } catch (RemoteException re) {
@@ -22,6 +21,8 @@ public class SortingClient {
       System.out.println(
               "NotBoundException");
       System.out.println(nbe.getMessage());
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
     }
   }
 
