@@ -49,7 +49,7 @@ abstract class AbstractServer implements Server {
     return reverseAndChange(input);
   }
 
-  public static String reverseAndChange(String s) {
+  private static String reverseAndChange(String s) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < s.length(); i++) {
       if (s.charAt(i) >= 'A' && s.charAt(i) <= 'Z') {

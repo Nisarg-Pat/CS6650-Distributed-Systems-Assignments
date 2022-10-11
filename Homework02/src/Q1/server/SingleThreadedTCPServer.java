@@ -27,8 +27,6 @@ class SingleThreadedTCPServer extends AbstractServer {
   public SingleThreadedTCPServer(int port) throws IOException {
     super(port);
     serverSocket = new ServerSocket(port);
-
-
   }
 
   @Override

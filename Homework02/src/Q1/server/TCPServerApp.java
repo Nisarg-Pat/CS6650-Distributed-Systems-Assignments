@@ -18,12 +18,18 @@ public class TCPServerApp {
     //Validates the command line arguments
     DataUtils.validateServerArguments(args);
 
-    int port = Integer.parseInt(args[0]);
+    String type = args[0];
+    int port = Integer.parseInt(args[1]);
 
     //Creating a TCP server and calling start
     try {
-      AbstractServer server = new SingleThreadedTCPServer(port);
-      server.start();
+      if(type.equals("single")) {
+        Server server = new SingleThreadedTCPServer(port);
+        server.start();
+      } else if(type.equals("multi")) {
+        Server server = new MultiThreadedTCPServer(port);
+        server.start();
+      }
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
