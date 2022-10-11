@@ -2,6 +2,9 @@ package client;
 
 import java.io.IOException;
 
+/**
+ * Interface for Client
+ */
 public interface Client {
 
   /**
