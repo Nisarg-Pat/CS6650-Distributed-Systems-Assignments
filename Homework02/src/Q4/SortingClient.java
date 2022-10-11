@@ -13,8 +13,25 @@ public class SortingClient {
   public static Sorter sorter;
 
   public static void main(String[] args) {
+
+    if (args.length != 2) {
+      System.out.println("Improper number of arguments! Required 2 arguments: host port");
+      return;
+    }
+
+    String host = args[0];
+    int port;
+
     try {
-      sorter = (Sorter) Naming.lookup("rmi://localhost:1099/SortingService");
+      port = Integer.parseInt(args[1]);
+    } catch (NumberFormatException e) {
+      System.out.println(args[1] + " is not a valid port number!!");
+      return;
+    }
+
+    try {
+      Registry registry = LocateRegistry.getRegistry(host, port);
+      sorter = (Sorter) registry.lookup("SortingService");
       Scanner sc = new Scanner(System.in);
       System.out.print("Enter the number of integers: ");
       int n = sc.nextInt();
@@ -33,8 +50,6 @@ public class SortingClient {
       System.out.println(
               "NotBoundException");
       System.out.println(nbe.getMessage());
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
     }
   }
 
