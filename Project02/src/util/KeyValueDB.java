@@ -36,4 +36,11 @@ public interface KeyValueDB extends Remote {
      * Populates the database with some key-value pairs
      */
     void populate() throws RemoteException;
+
+    /**
+     * Returns the contents of database
+     *
+     * @return the contents of database in String format
+     */
+    String getString() throws RemoteException;
 }

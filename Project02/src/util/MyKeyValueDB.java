@@ -62,13 +62,8 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
         map.put("Strong", "Weak");
     }
 
-    /**
-     * Returns the contents of database
-     *
-     * @return the contents of database in String format
-     */
     @Override
-    public String toString() {
+    public String getString() {
         StringBuilder sb = new StringBuilder();
         for (String key : map.keySet()) {
             sb.append("(").append(key).append(", ").append(map.get(key)).append(")\n");

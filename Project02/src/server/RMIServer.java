@@ -34,6 +34,7 @@ public class RMIServer implements Server {
     public void start() {
         try {
             KeyValueDB db = new MyKeyValueDB();
+            db.populate();
             Registry registry = LocateRegistry.getRegistry(port);
             registry.rebind("KeyValueDBService", db);
         } catch (Exception e) {
