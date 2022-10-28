@@ -6,7 +6,7 @@ RMI_CLIENT_CONTAINER='my-rmi-client'
 
 if [ $# -ne 2 ]
 then
-  echo "Usage: ./run_server.sh <rmiregistry-container-name> <port-number>"
+  echo "Usage: ./run_server.sh <server-container-name> <port-number>"
   exit
 fi
 

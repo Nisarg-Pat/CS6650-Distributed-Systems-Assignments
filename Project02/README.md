@@ -35,24 +35,20 @@ Follow these steps to run the applications using docker:
    > $ cd src
 2) Run the deploy.sh bash files to create docker images
    > $ ./deploy.sh
-3) Run the TCP/UDP server application using run_server.sh bash file with (tcp/udp)
+3) Run the RMI server application using run_server.sh bash file
+   > $ ./run_server.sh
+4) The RMIRegistry runs on my-rmi-server container and at port 1234. 
+   Run the RMI client application using run_client.sh bash file with server-container-name,
    and port number as arguments.
-   > $ ./run_server.sh tcp 1111
-   >
-   > Or
-   >
-   > $ ./run_server.sh udp 5555
-4) Run the TCP/UDP client application using run_client.sh bash file with (tcp/udp), server-container-name,
-   and port number as arguments.
-   > $ ./run_client.sh tcp my-tcp-server 1111
-   >
-   > Or
-   >
-   > $ ./run_client.sh udp my-udp-server 5555
-5) The server and client are ready to communicate.
+   > $ ./run_client.sh my-rmi-server 1234
+5) The server and client are ready to communicate. You can create multiple clients and interact with server.
 
 Note: If any of the bash files does not execute, try using bash before ./*.sh
 > $ bash ./deploy.sh
+
+Note: I have changed the permissions on .sh files to make it executable but since I am using Windows, but since other operating system can be used, please change the permission by doing:
+> $ chmod 755 (filename).sh
+
 
 
 ## How to Use
