@@ -26,6 +26,8 @@ public class RMIClient implements Client {
     private final String host;
     private final int port;
 
+    private static boolean connected;
+
     private static KeyValueDB db;
 
     /**
@@ -45,6 +47,7 @@ public class RMIClient implements Client {
 
         Registry registry = LocateRegistry.getRegistry(this.host, this.port);
         db = (KeyValueDB) registry.lookup("KeyValueDBService");
+        this.connected = true;
 
         //Creating a log file
         clientLog.createFile("TCPClientLog.txt");
@@ -53,24 +56,34 @@ public class RMIClient implements Client {
 
     @Override
     public void execute() throws RemoteException {
-        clientLog.logln("Database Content(Key, Value):\n" + db.getString());
+        try {
+            clientLog.logln("Database Content(Key, Value):\n" + db.getString());
+        } catch (RemoteException e) {
+            clientLog.logln(e.getMessage());
+        }
+
         clientLog.logln("Possible commands: PUT/GET/DELETE/QUIT\n");
         String input = "";
-        while (true) {
-            //Taking client request
-            clientLog.log("Command: ");
-            input = scanner.nextLine();
-            clientLog.logOnly(input);
-            if (input.equals("QUIT")) {
-                break;
+        try {
+            while (connected) {
+                //Taking client request
+                clientLog.log("Command: ");
+                input = scanner.nextLine();
+                clientLog.logOnly(input);
+                if (input.equals("QUIT")) {
+                    break;
+                }
+                //Requesting to the server
+                String output = processRequest(input);
+                clientLog.logln("Response: " + output);
             }
-            //Requesting to the server
-            String output = processRequest(input);
-            clientLog.logln(output);
+        } catch (Exception e) {
+            //Empty catch for cntl+C
         }
+        clientLog.logln("Connection to server closed!");
     }
 
-    private String processRequest(String input) throws RemoteException {
+    private String processRequest(String input) {
         if (input.equals("ALL")) {
             //Gives list of all key-value pair in the database
             //Automatically called initially by the client
@@ -184,7 +197,8 @@ public class RMIClient implements Client {
                     returnValue = String.format("Cannot put (%s, %s) in database. Please check the key and value.", key, value);
                 }
             } catch (RemoteException e) {
-                returnValue = e.getMessage();
+                returnValue = "Host Disconnected! Try Again!!";
+                connected = false;
             }
         }
     }
@@ -210,7 +224,8 @@ public class RMIClient implements Client {
                     returnValue = res;
                 }
             } catch (RemoteException e) {
-                returnValue = e.getMessage();
+                returnValue = "Host Disconnected! Try Again!!";
+                connected = false;
             }
         }
     }
@@ -236,7 +251,8 @@ public class RMIClient implements Client {
                     returnValue = key + " is not present in database";
                 }
             } catch (RemoteException e) {
-                returnValue = e.getMessage();
+                returnValue = "Host Disconnected! Try Again!!";
+                connected = false;
             }
         }
     }

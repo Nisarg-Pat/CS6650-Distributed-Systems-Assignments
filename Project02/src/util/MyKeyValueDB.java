@@ -28,13 +28,7 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     @Override
     public String get(String key) {
 
-        synchronized(LOCK) {
-                    try {
-            wait = (1-(wait/10000))*10000;
-            Thread.sleep(wait);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        synchronized (LOCK) {
             if (!map.containsKey(key)) {
                 return "";
             }
@@ -47,13 +41,7 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     public boolean put(String key, String value) {
 
 
-        synchronized(LOCK) {
-                    try {
-            wait = (1-(wait/10000))*10000;
-            Thread.sleep(wait);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        synchronized (LOCK) {
             if (key.isBlank() || value.isBlank()) {
                 return false;
             }
@@ -66,13 +54,7 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     @Override
     public boolean delete(String key) {
 
-        synchronized(LOCK) {
-                    try {
-            wait = (1-(wait/10000))*10000;
-            Thread.sleep(wait);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
-        }
+        synchronized (LOCK) {
             if (!map.containsKey(key)) {
                 return false;
             }
