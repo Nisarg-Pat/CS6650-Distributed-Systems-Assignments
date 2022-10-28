@@ -12,6 +12,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
+/**
+ * RMI implementation of Client.
+ */
 public class RMIClient implements Client {
 
     protected final Scanner scanner;
@@ -23,8 +26,16 @@ public class RMIClient implements Client {
     private final String host;
     private final int port;
 
-    public static KeyValueDB db;
+    private static KeyValueDB db;
 
+    /**
+     * Constructor for RMIClient
+     *
+     * @param host hostname of the rmiregistry
+     * @param port port of the rmiregistry
+     * @throws RemoteException
+     * @throws NotBoundException
+     */
     public RMIClient(String host, int port) throws RemoteException, NotBoundException {
         this.host = host;
         this.port = port;
@@ -37,11 +48,11 @@ public class RMIClient implements Client {
 
         //Creating a log file
         clientLog.createFile("TCPClientLog.txt");
-        clientLog.logln(String.format("Connected to server at %s:%s", host, port));
+//        clientLog.logln(String.format("Connected to server at %s:%s", host, port));
     }
 
     @Override
-    public void execute() throws IOException {
+    public void execute() throws RemoteException {
         clientLog.logln("Database Content(Key, Value):\n" + db.getString());
         clientLog.logln("Possible commands: PUT/GET/DELETE/QUIT\n");
         String input = "";
@@ -59,7 +70,7 @@ public class RMIClient implements Client {
         }
     }
 
-    public String processRequest(String input) throws RemoteException {
+    private String processRequest(String input) throws RemoteException {
         if (input.equals("ALL")) {
             //Gives list of all key-value pair in the database
             //Automatically called initially by the client
@@ -72,14 +83,7 @@ public class RMIClient implements Client {
                 if (checkPut(data)) {
                     String key = data[1];
                     String value = data[2];
-                    boolean res = db.put(key, value);
-                    if (res) {
-                        //PUT successful
-                        return String.format("(%s, %s) added successfully", key, value);
-                    } else {
-                        //PUT failed. It can be because of blank or improper key or value.
-                        return String.format("Cannot put (%s, %s) in database. Please check the key and value.", key, value);
-                    }
+                    return getOutput(new PutRunnable(key, value));
                 } else {
                     //Improper arguments after PUT
                     return "Invalid format for PUT. Expected: PUT <key> <value>";
@@ -87,14 +91,7 @@ public class RMIClient implements Client {
             case "GET":
                 if (checkGet(data)) {
                     String key = data[1];
-                    String res = db.get(key);
-                    if (res.equals("")) {
-                        //GET failed. It can occur if the key is not present in the database.
-                        return key + " is not present in database.";
-                    } else {
-                        //GET successful
-                        return res;
-                    }
+                    return getOutput(new GetRunnable(key));
                 } else {
                     //Improper arguments after GET
                     return "Invalid format for GET. Expected: GET <key>";
@@ -102,14 +99,7 @@ public class RMIClient implements Client {
             case "DELETE":
                 if (checkDelete(data)) {
                     String key = data[1];
-                    boolean res = db.delete(key);
-                    if (res) {
-                        //DELETE successful
-                        return "Successfully deleted " + key;
-                    } else {
-                        //DELETE failed. It can occur if the key is not present in the database.
-                        return key + " is not present in database";
-                    }
+                    return getOutput(new DeleteRunnable(key));
                 } else {
                     //Improper arguments after DELETE
                     return "Invalid format for DELETE. Expected: DELETE <key>";
@@ -118,6 +108,19 @@ public class RMIClient implements Client {
                 //Improper request from client or command not recognized
                 return "Received malformed request from client!!";
         }
+    }
+
+    private String getOutput(DBRunnable runnable) {
+        Thread thread = new Thread(runnable);
+        thread.start();
+        long timeoutTime = System.currentTimeMillis() + TIMEOUT;
+        while (thread.isAlive()) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime >= timeoutTime) {
+                return "Server Timeout! Please try requesting again\n";
+            }
+        }
+        return runnable.returnValue;
     }
 
     /**
@@ -148,5 +151,93 @@ public class RMIClient implements Client {
      */
     private boolean checkPut(String[] data) {
         return data.length == 3;
+    }
+
+    abstract static class DBRunnable implements Runnable {
+        String returnValue;
+
+        DBRunnable() {
+            returnValue = "";
+        }
+    }
+
+    static class PutRunnable extends DBRunnable {
+
+        String key;
+        String value;
+
+        PutRunnable(String key, String value) {
+            super();
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public void run() {
+            try {
+                boolean res = db.put(key, value);
+                if (res) {
+                    //PUT successful
+                    returnValue = String.format("(%s, %s) added successfully", key, value);
+                } else {
+                    //PUT failed. It can be because of blank or improper key or value.
+                    returnValue = String.format("Cannot put (%s, %s) in database. Please check the key and value.", key, value);
+                }
+            } catch (RemoteException e) {
+                returnValue = e.getMessage();
+            }
+        }
+    }
+
+    static class GetRunnable extends DBRunnable {
+
+        String key;
+
+        GetRunnable(String key) {
+            super();
+            this.key = key;
+        }
+
+        @Override
+        public void run() {
+            try {
+                String res = db.get(key);
+                if (res.equals("")) {
+                    //GET failed. It can occur if the key is not present in the database.
+                    returnValue = key + " is not present in database.";
+                } else {
+                    //GET successful
+                    returnValue = res;
+                }
+            } catch (RemoteException e) {
+                returnValue = e.getMessage();
+            }
+        }
+    }
+
+    static class DeleteRunnable extends DBRunnable {
+
+        String key;
+
+        DeleteRunnable(String key) {
+            super();
+            this.key = key;
+        }
+
+        @Override
+        public void run() {
+            try {
+                boolean res = db.delete(key);
+                if (res) {
+                    //DELETE successful
+                    returnValue = "Successfully deleted " + key;
+                } else {
+                    //DELETE failed. It can occur if the key is not present in the database.
+                    returnValue = key + " is not present in database";
+                }
+            } catch (RemoteException e) {
+                returnValue = e.getMessage();
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import util.DataUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 /**
  * RMI Client Application
@@ -27,7 +28,7 @@ public class RMIClientApp {
             //Creating a TCP Client and calling execute
             Client client = new RMIClient(host, port);
             client.execute();
-        } catch (IOException | NotBoundException e) {
+        } catch (NotBoundException | RemoteException e) {
             System.out.println(e.getMessage());
         }
     }

@@ -1,6 +1,7 @@
 package client;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 /**
  * Interface for Client
@@ -16,6 +17,6 @@ public interface Client {
    *
    * @throws IOException
    */
-  void execute() throws IOException;
+  void execute() throws RemoteException;
 
 }

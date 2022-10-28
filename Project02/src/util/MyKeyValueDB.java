@@ -14,6 +14,9 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
 
     private int wait = 10000;
 
+    //Using a single lock to perform hashmap operations(get/put/delete) to achieve mutual exclusion
+    private static final Object LOCK = new Object();
+
     /**
      * Constructor for the database
      */
@@ -23,47 +26,60 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     }
 
     @Override
-    public synchronized String get(String key) {
-//        try {
-//            wait = (1-(wait/10000))*10000;
-//            Thread.sleep(wait);
-//        } catch (InterruptedException e) {
-//            System.out.println(e.getMessage());
-//        }
-        if (!map.containsKey(key)) {
-            return "";
+    public String get(String key) {
+
+        synchronized(LOCK) {
+                    try {
+            wait = (1-(wait/10000))*10000;
+            Thread.sleep(wait);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         }
-        return map.get(key);
+            if (!map.containsKey(key)) {
+                return "";
+            }
+            return map.get(key);
+        }
+
     }
 
     @Override
-    public synchronized boolean put(String key, String value) {
-//        try {
-//            wait = (1-(wait/10000))*10000;
-//            Thread.sleep(wait);
-//        } catch (InterruptedException e) {
-//            System.out.println(e.getMessage());
-//        }
-        if (key.isBlank() || value.isBlank()) {
-            return false;
+    public boolean put(String key, String value) {
+
+
+        synchronized(LOCK) {
+                    try {
+            wait = (1-(wait/10000))*10000;
+            Thread.sleep(wait);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         }
-        map.put(key, value);
-        return true;
+            if (key.isBlank() || value.isBlank()) {
+                return false;
+            }
+            map.put(key, value);
+            return true;
+        }
+
     }
 
     @Override
-    public synchronized boolean delete(String key) {
-//        try {
-//            wait = (1-(wait/10000))*10000;
-//            Thread.sleep(wait);
-//        } catch (InterruptedException e) {
-//            System.out.println(e.getMessage());
-//        }
-        if (!map.containsKey(key)) {
-            return false;
+    public boolean delete(String key) {
+
+        synchronized(LOCK) {
+                    try {
+            wait = (1-(wait/10000))*10000;
+            Thread.sleep(wait);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
         }
-        map.remove(key);
-        return true;
+            if (!map.containsKey(key)) {
+                return false;
+            }
+            map.remove(key);
+            return true;
+        }
+
     }
 
     @Override
