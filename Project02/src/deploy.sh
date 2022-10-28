@@ -5,14 +5,11 @@ SERVER_IMAGE='project2-server-image'
 RMI_SERVER_CONTAINER='my-rmi-server'
 CLIENT_IMAGE='project2-client-image'
 RMI_CLIENT_CONTAINER='my-rmi-client'
-#REGISTRY_IMAGE='my-rmi-registry'
-REGISTRY_CONTAINER='my-registry-container'
 
 # clean up existing resources, if any
 echo "----------Cleaning up existing resources----------"
 docker container stop $RMI_SERVER_CONTAINER 2> /dev/null && docker container rm $RMI_SERVER_CONTAINER 2> /dev/null
 docker container stop $RMI_CLIENT_CONTAINER 2> /dev/null && docker container rm $RMI_CLIENT_CONTAINER 2> /dev/null
-docker container stop $REGISTRY_CONTAINER 2> /dev/null && docker container rm $REGISTRY_CONTAINER 2> /dev/null
 docker network rm $PROJECT_NETWORK 2> /dev/null
 
 # only cleanup
@@ -29,4 +26,3 @@ docker network create $PROJECT_NETWORK
 echo "----------Building images----------"
 docker build -t $CLIENT_IMAGE --target client-build .
 docker build -t $SERVER_IMAGE --target server-build .
-#docker build -t $REGISTRY_IMAGE --target rmiregistry-build .

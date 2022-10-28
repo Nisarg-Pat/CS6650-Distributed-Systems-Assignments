@@ -10,10 +10,6 @@ then
   exit
 fi
 
-echo "$1"
-
-winpty docker run -it --rm --name $REGISTRY_CONTAINER \
+docker run -it --rm --name $REGISTRY_CONTAINER \
    --network $PROJECT_NETWORK $SERVER_IMAGE \
    rmiregistry "$1"
-
-#winpty docker exec $RMI_SERVER_CONTAINER /bin/bash java server.RMIServerApp "$1"

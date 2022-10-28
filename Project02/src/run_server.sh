@@ -10,8 +10,5 @@ then
   exit
 fi
 
-winpty docker run -it --rm --name $RMI_SERVER_CONTAINER \
-   --network $PROJECT_NETWORK $SERVER_IMAGE \
-   java server.RMIServerApp "$1"
-
-#winpty docker exec $RMI_SERVER_CONTAINER /bin/bash java server.RMIServerApp "$1"
+docker run -it --rm --name $RMI_SERVER_CONTAINER \
+   --network $PROJECT_NETWORK $SERVER_IMAGE
