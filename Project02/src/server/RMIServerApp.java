@@ -2,7 +2,7 @@ package server;
 
 import util.DataUtils;
 
-import java.io.IOException;
+import java.rmi.RemoteException;
 
 /**
  * RMI Server Application
@@ -24,9 +24,8 @@ public class RMIServerApp {
         try {
             Server server = new RMIServer(port);
             server.start();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        } catch (RemoteException e) {
+            System.out.println("Server could not start! Reason: " + e.getMessage());
         }
-
     }
 }

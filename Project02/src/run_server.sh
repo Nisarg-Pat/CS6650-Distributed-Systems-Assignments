@@ -1,28 +1,17 @@
 #!/bin/bash
 
-PROJECT_NETWORK='project1-network'
-SERVER_IMAGE='project1-server-image'
-TCP_SERVER_CONTAINER='my-tcp-server'
-UDP_SERVER_CONTAINER='my-udp-server'
+PROJECT_NETWORK='project2-network'
+SERVER_IMAGE='project2-server-image'
+RMI_SERVER_CONTAINER='my-rmi-server'
 
-if [ $# -ne 2 ]
+if [ $# -ne 1 ]
 then
-  echo "Usage: ./run_server.sh <tcp/udp> <port-number>"
+  echo "Usage: ./run_server.sh <port-number>"
   exit
 fi
 
-if [ "$1" == "tcp" ]
-then
-  # run client docker container with cmd args
-  docker run -it --rm --name $TCP_SERVER_CONTAINER \
+winpty docker run -it --rm --name $RMI_SERVER_CONTAINER \
    --network $PROJECT_NETWORK $SERVER_IMAGE \
-   java server.TCPServerApp "$2"
-elif [ "$1" == "udp" ]
-then
-  docker run -it --rm --name $UDP_SERVER_CONTAINER \
-   --network $PROJECT_NETWORK $SERVER_IMAGE \
-   java server.UDPServerApp "$2"
-else
-  echo "Usage: ./run_server.sh <tcp/udp> <port-number>"
-  exit
-fi
+   java server.RMIServerApp "$1"
+
+#winpty docker exec $RMI_SERVER_CONTAINER /bin/bash java server.RMIServerApp "$1"

@@ -10,7 +10,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class RMIServer implements Server {
+/**
+ * Access: pakage-protected
+ * Class for RMI Server
+ */
+class RMIServer implements Server {
 
     protected final int port;
     protected final KeyValueDB db;
@@ -21,7 +25,7 @@ public class RMIServer implements Server {
      * Constructor for RMIServer
      *
      * @param port port at which the server should listen
-     * @throws IOException
+     * @throws RemoteException If unable to create instance of remote object db.
      */
     public RMIServer(int port) throws RemoteException {
         this.port = port;

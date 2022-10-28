@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A simple Key-Value Database.
+ * A simple implementation of Key-Value Database.
  */
 public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
 
     private final Map<String, String> map;
+
+    private int wait = 10000;
 
     /**
      * Constructor for the database
@@ -21,7 +23,13 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     }
 
     @Override
-    public String get(String key) {
+    public synchronized String get(String key) {
+//        try {
+//            wait = (1-(wait/10000))*10000;
+//            Thread.sleep(wait);
+//        } catch (InterruptedException e) {
+//            System.out.println(e.getMessage());
+//        }
         if (!map.containsKey(key)) {
             return "";
         }
@@ -29,7 +37,13 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     }
 
     @Override
-    public boolean put(String key, String value) {
+    public synchronized boolean put(String key, String value) {
+//        try {
+//            wait = (1-(wait/10000))*10000;
+//            Thread.sleep(wait);
+//        } catch (InterruptedException e) {
+//            System.out.println(e.getMessage());
+//        }
         if (key.isBlank() || value.isBlank()) {
             return false;
         }
@@ -38,7 +52,13 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     }
 
     @Override
-    public boolean delete(String key) {
+    public synchronized boolean delete(String key) {
+//        try {
+//            wait = (1-(wait/10000))*10000;
+//            Thread.sleep(wait);
+//        } catch (InterruptedException e) {
+//            System.out.println(e.getMessage());
+//        }
         if (!map.containsKey(key)) {
             return false;
         }

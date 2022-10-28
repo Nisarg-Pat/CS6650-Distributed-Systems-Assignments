@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.rmi.NotBoundException;
 
+/**
+ * RMI Client Application
+ */
 public class RMIClientApp {
     /**
      * Main Method to start RMI Client
      *
-     * @param args Required args: <hostname or IP> <port>
+     * @param args Required args: <hostname> <port>
      */
     public static void main(String[] args) {
 
