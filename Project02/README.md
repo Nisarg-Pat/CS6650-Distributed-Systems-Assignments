@@ -39,17 +39,19 @@ Follow these steps to run the applications using docker:
    > $ ./run_server.sh
 4) The RMIRegistry runs on my-rmi-server container and at port 1234. 
    Run the RMI client application using run_client.sh bash file with server-container-name,
-   and port number as arguments.
+   and port number as arguments in a different terminal.
    > $ ./run_client.sh my-rmi-server 1234
 5) The server and client are ready to communicate. You can create multiple clients and interact with server.
 
 Note: If any of the bash files does not execute, try using bash before ./*.sh
 > $ bash ./deploy.sh
 
-Note: I have changed the permissions on .sh files to make it executable but since I am using Windows, but since other operating system can be used, please change the permission by doing:
+Note: I have changed the permissions on .sh files to make it executable, and I am using Windows.
+but since other operating system can be used, if permission denied error occurs, please change the permission by doing:
 > $ chmod 755 (filename).sh
 
-
+Note: If any such error occurs: "./run_server.sh: line 2: $'\r': command not found", 
+please change the Line seperator from CRLF to LF of all the ./sh files.
 
 ## How to Use
 Once client has started, the list of key-value pairs present in the server is shown in the console.
@@ -70,8 +72,13 @@ Client can perform one of the following commands on the terminal:
 ## Examples and Sample Images
 
 Sample images of client/server interaction is present in the res/Screenshots folder.
+1) RMIServer.png: How to run the RMIServerApp
+2) RMIClient1.png and RMIClient2.png: Sample images showing to run RMIClient and how data is shown in RMIClientApp.
 
-1) RMIClientApp.png: Sample files to look how data is shown in RMIServerApp.
+
+## Limitations
+1) The docker image for running server has port predefined as 1234. I was not able to make it dynamic. 
+   So run_server currently does not take any arguments but runs the rmiregistry on fixed port 1234.
 
 ## Citations
 1. Java RMI: https://www.cs.uic.edu/~troy/fall04/cs441/rmi/calc/index.html

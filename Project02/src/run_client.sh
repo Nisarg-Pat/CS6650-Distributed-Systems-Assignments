@@ -10,6 +10,6 @@ then
   exit
 fi
 
-docker run -it --rm --name $RMI_CLIENT_CONTAINER \
+docker run -it --rm \
    --network $PROJECT_NETWORK $CLIENT_IMAGE \
    java client.RMIClientApp "$1" "$2"
