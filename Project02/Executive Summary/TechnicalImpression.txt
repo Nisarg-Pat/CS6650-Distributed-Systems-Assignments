@@ -1,0 +1,7 @@
+Technical Impression:
+
+I considered it as a relatively easier project since I reused most of the code that I wrote in first project with refactoring wherever necessary. For example, the protocol of taking input was same as before, and the conditions to check the proper input format and the outputs remained the same. Since this project required to use RMI and the how to use RMI was already covered in a homework assignment, it was easier to implement. Overall, I found that use of JAVA RMI (and thus the middleware) is very useful to create distributed applications.
+
+For the multithreaded part also, the JAVA RMI already accepts multiple clients. So, the only thing to implement was to make the calls to database, thread-safe. I initially wrote all the 3 methods: GET/PUT/DELETE in the database individually synchronized which I tested by adding random sleeps on each of the call. But it led to a race condition for the sequence when delete is called before get by other client but gets executed before it. So, to handle such cases I created a single lock for all the three methods, which solved the issue.
+
+Overall, I believed it was a simple assignment just on the facts that much of the implementation work was already covered in first project and homework assignments which helps to understand the concept of remote procedure calls and multithreaded in a better way.
