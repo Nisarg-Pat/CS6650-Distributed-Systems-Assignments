@@ -10,7 +10,7 @@ import Q1.util.DataUtils;
 public class TCPServerApp {
 
   /**
-   * Main Method to start UDP Client
+   * Main Method to start TCP Server App
    *
    * @param args Required args: <port>
    */
