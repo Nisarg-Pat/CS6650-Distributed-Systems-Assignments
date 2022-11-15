@@ -5,6 +5,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import server.command.DeleteCommand;
+import server.command.GetCommand;
+import server.command.PutCommand;
 import util.KeyValueDB;
 import util.Log;
 
@@ -12,7 +15,7 @@ import util.Log;
  * Access: pakage-protected
  * Class for RMI Server
  */
-class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
+class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server, CommitProtocol {
 
     protected final int port;
     protected final MyKeyValueDB db;
@@ -54,17 +57,17 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
 
     @Override
     public String get(String key) throws RemoteException {
-        return db.get(key);
+        return (String) new GetCommand(db, key).execute();
     }
 
     @Override
     public boolean put(String key, String value) throws RemoteException {
-        return db.put(key, value);
+        return (boolean) new PutCommand(db, key, value).execute();
     }
 
     @Override
     public boolean delete(String key) throws RemoteException {
-        return db.delete(key);
+        return (boolean) new DeleteCommand(db, key).execute();
     }
 
     @Override
@@ -75,5 +78,35 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
     @Override
     public String getString() throws RemoteException {
         return db.getString();
+    }
+
+    @Override
+    public boolean canCommit(Transaction transaction) {
+        return false;
+    }
+
+    @Override
+    public boolean doCommit(Transaction transaction) {
+        return false;
+    }
+
+    @Override
+    public boolean doAbort(Transaction transaction) {
+        return false;
+    }
+
+    @Override
+    public boolean haveCommited(Transaction transaction) {
+        return false;
+    }
+
+    @Override
+    public boolean getDecision(Transaction transaction) {
+        return false;
+    }
+
+    @Override
+    public boolean performTransaction(Transaction transaction) {
+        return false;
     }
 }

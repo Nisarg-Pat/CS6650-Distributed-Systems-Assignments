@@ -27,6 +27,17 @@ public class MyKeyValueDB {
         map = new HashMap<>();
     }
 
+    public MyKeyValueDB copy() {
+
+        synchronized (LOCK) {
+            MyKeyValueDB copyDB = new MyKeyValueDB();
+            for(Map.Entry<String, String> entry: map.entrySet()) {
+                copyDB.put(entry.getKey(), entry.getValue());
+            }
+            return copyDB;
+        }
+    }
+
     public String get(String key) {
 
         synchronized (LOCK) {
