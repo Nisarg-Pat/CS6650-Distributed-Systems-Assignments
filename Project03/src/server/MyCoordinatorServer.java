@@ -38,4 +38,34 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
       System.out.println("Trouble: " + e);
     }
   }
+
+  @Override
+  public boolean canCommit(Transaction transaction) throws RemoteException {
+    return false;
+  }
+
+  @Override
+  public List<Object> doCommit(Transaction transaction) throws RemoteException {
+    return null;
+  }
+
+  @Override
+  public List<Object> doAbort(Transaction transaction) throws RemoteException {
+    return null;
+  }
+
+  @Override
+  public boolean haveCommited(Transaction transaction) throws RemoteException {
+    return false;
+  }
+
+  @Override
+  public boolean getDecision(Transaction transaction) throws RemoteException {
+    return false;
+  }
+
+  @Override
+  public List<Object> performTransaction(Transaction transaction) throws RemoteException {
+    return null;
+  }
 }

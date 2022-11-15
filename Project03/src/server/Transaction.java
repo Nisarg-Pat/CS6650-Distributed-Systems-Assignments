@@ -1,28 +1,42 @@
 package server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import server.command.Command;
 
-class Transaction {
-  private final int id;
+class Transaction implements Serializable {
+  private final String id;
   private final List<Command> commandList;
+  private final List<Object> result;
 
-  Transaction(int id) {
+  Transaction(String id) {
     this.id = id;
     commandList = new ArrayList<>();
+    result = new ArrayList<>();
   }
 
   public void addCommand(Command command) {
     commandList.add(command);
   }
 
-  public int getId() {
+  public String getId() {
     return id;
   }
 
   public List<Command> getCommandList() {
     return commandList;
+  }
+
+  public List<Object> getResult() {
+    return result;
+  }
+
+  public List<Object> execute(MyKeyValueDB db) {
+    for(Command command: commandList) {
+      result.add(command.execute(db));
+    }
+    return result;
   }
 }

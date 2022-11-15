@@ -3,16 +3,14 @@ package server.command;
 import server.MyKeyValueDB;
 
 public class DeleteCommand implements Command {
-  private final MyKeyValueDB db;
   private final String key;
 
-  public DeleteCommand(MyKeyValueDB db, String key) {
-    this.db = db;
+  public DeleteCommand(String key) {
     this.key = key;
   }
 
   @Override
-  public Object execute() {
+  public Object execute(MyKeyValueDB db) {
     return db.delete(key);
   }
 }

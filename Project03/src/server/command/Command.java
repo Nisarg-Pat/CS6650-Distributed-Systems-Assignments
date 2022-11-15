@@ -1,5 +1,9 @@
 package server.command;
 
-public interface Command {
-  Object execute();
+import java.io.Serializable;
+
+import server.MyKeyValueDB;
+
+public interface Command extends Serializable {
+  Object execute(MyKeyValueDB db);
 }

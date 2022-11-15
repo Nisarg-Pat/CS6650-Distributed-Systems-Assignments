@@ -5,16 +5,14 @@ import util.KeyValueDB;
 
 public class GetCommand implements Command {
 
-  private final MyKeyValueDB db;
   private final String key;
 
-  public GetCommand(MyKeyValueDB db, String key) {
-    this.db = db;
+  public GetCommand(String key) {
     this.key = key;
   }
 
   @Override
-  public Object execute() {
+  public Object execute(MyKeyValueDB db) {
     return db.get(key);
   }
 }
