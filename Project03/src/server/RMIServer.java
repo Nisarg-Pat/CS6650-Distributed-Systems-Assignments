@@ -19,6 +19,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
 
     protected final Log serverLog;
 
+    protected CoordinatorServer coordinatorServer;
+
     /**
      * Constructor for RMIServer
      *
@@ -26,6 +28,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
      * @throws RemoteException If unable to create instance of remote object db.
      */
     public RMIServer(int port) throws RemoteException {
+        super(port);
         this.port = port;
         this.db = new MyKeyValueDB();
         this.db.populate();
@@ -39,6 +42,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("KeyValueDBService", this);
             System.out.println("RMIServer started");
+
+            Registry coordinatorRegistry = LocateRegistry.getRegistry(CoordinatorServer.PORT);
+            coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
+            coordinatorServer.addServer(this);
+            System.out.println(coordinatorServer.getAllServers());
         } catch (Exception e) {
             System.out.println("Trouble: " + e);
         }

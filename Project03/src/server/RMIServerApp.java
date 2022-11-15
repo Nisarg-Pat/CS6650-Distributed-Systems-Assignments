@@ -22,8 +22,11 @@ public class RMIServerApp {
 
         //Creating the RMI server and calling start
         try {
-            Server server = new RMIServer(port);
-            server.start();
+            if(port == 9999) {
+                new MyCoordinatorServer(port).start();
+            } else {
+                new RMIServer(port).start();
+            }
         } catch (RemoteException e) {
             System.out.println("Server could not start! Reason: " + e.getMessage());
         }
