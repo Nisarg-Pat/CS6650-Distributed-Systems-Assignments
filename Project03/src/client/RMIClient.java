@@ -114,6 +114,15 @@ public class RMIClient implements Client {
                     //Improper arguments after DELETE
                     return "Invalid format for DELETE. Expected: DELETE <key>";
                 }
+            case "CONNECT":
+                try {
+                    int port = Integer.parseInt(data[1]);
+                    Registry registry = LocateRegistry.getRegistry(this.host, port);
+                    db = (KeyValueDB) registry.lookup("KeyValueDBService");
+                    return "Connected to server at port "+ port;
+                } catch (Exception e) {
+                    return "Error connecting to the server at port "+ data[1];
+                }
             default:
                 //Improper request from client or command not recognized
                 return "Received malformed request from client!!";
