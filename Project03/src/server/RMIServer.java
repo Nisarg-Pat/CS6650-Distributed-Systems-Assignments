@@ -1,14 +1,12 @@
 package server;
 
-import util.KeyValueDB;
-import util.Log;
-import util.MyKeyValueDB;
-
-import java.io.IOException;
-import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
+import util.KeyValueDB;
+import util.Log;
+import util.MyKeyValueDB;
 
 /**
  * Access: pakage-protected

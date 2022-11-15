@@ -1,11 +1,9 @@
 package client;
 
-import util.DataUtils;
-
-import java.io.IOException;
-import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+
+import util.DataUtils;
 
 /**
  * RMI Client Application

@@ -1,16 +1,13 @@
 package client;
 
-import util.KeyValueDB;
-import util.Log;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
+
+import util.KeyValueDB;
+import util.Log;
 
 /**
  * RMI implementation of Client.

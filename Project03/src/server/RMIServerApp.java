@@ -1,8 +1,8 @@
 package server;
 
-import util.DataUtils;
-
 import java.rmi.RemoteException;
+
+import util.DataUtils;
 
 /**
  * RMI Server Application
