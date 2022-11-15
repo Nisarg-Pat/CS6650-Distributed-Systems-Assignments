@@ -3,19 +3,19 @@ package server;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 import util.KeyValueDB;
 import util.Log;
-import util.MyKeyValueDB;
 
 /**
  * Access: pakage-protected
  * Class for RMI Server
  */
-class RMIServer implements Server {
+class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server {
 
     protected final int port;
-    protected final KeyValueDB db;
+    protected final MyKeyValueDB db;
 
     protected final Log serverLog;
 
@@ -33,15 +33,39 @@ class RMIServer implements Server {
     }
 
     @Override
-    public void start() {
+    public void start() throws RemoteException {
         try {
-            KeyValueDB db = new MyKeyValueDB();
             db.populate();
             Registry registry = LocateRegistry.createRegistry(port);
-            registry.rebind("KeyValueDBService", db);
+            registry.rebind("KeyValueDBService", this);
             System.out.println("RMIServer started");
         } catch (Exception e) {
             System.out.println("Trouble: " + e);
         }
+    }
+
+    @Override
+    public String get(String key) throws RemoteException {
+        return db.get(key);
+    }
+
+    @Override
+    public boolean put(String key, String value) throws RemoteException {
+        return db.put(key, value);
+    }
+
+    @Override
+    public boolean delete(String key) throws RemoteException {
+        return db.delete(key);
+    }
+
+    @Override
+    public void populate() throws RemoteException {
+        db.populate();
+    }
+
+    @Override
+    public String getString() throws RemoteException {
+        return db.getString();
     }
 }

@@ -1,14 +1,16 @@
-package util;
+package server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import util.KeyValueDB;
+
 /**
  * A simple implementation of Key-Value Database.
  */
-public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
+public class MyKeyValueDB {
 
     private final Map<String, String> map;
 
@@ -20,12 +22,11 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
     /**
      * Constructor for the database
      */
-    public MyKeyValueDB() throws RemoteException {
+    public MyKeyValueDB() {
         super();
         map = new HashMap<>();
     }
 
-    @Override
     public String get(String key) {
 
         synchronized (LOCK) {
@@ -37,7 +38,6 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
 
     }
 
-    @Override
     public boolean put(String key, String value) {
 
 
@@ -51,7 +51,6 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
 
     }
 
-    @Override
     public boolean delete(String key) {
 
         synchronized (LOCK) {
@@ -64,7 +63,6 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
 
     }
 
-    @Override
     public void populate() {
         map.put("Hello", "World");
         map.put("Accept", "Refuse");
@@ -80,7 +78,6 @@ public class MyKeyValueDB extends UnicastRemoteObject implements KeyValueDB {
         map.put("Strong", "Weak");
     }
 
-    @Override
     public String getString() {
         StringBuilder sb = new StringBuilder();
         for (String key : map.keySet()) {
