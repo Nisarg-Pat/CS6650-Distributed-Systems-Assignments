@@ -24,7 +24,7 @@ import util.Log;
  */
 class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
-    private static final int TRANSACTION_TIMEOUT = 12000; //5000 ms = 5 sec
+    private static final int TRANSACTION_TIMEOUT = 5000; //5000 ms = 5 sec
     private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
     protected MyKeyValueDB db;
@@ -144,11 +144,19 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         copyDB = db.copy();
         currentTransaction = transaction;
         currentTransaction.execute(copyDB);
-        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) {   //&& new Random().nextInt(5) != 0) {
+        try {
+            int delay = new Random().nextInt(1000);
+            System.out.println(delay);
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0 && new Random().nextInt(10) != 0) {
             System.out.println("canCommit "+transaction.getId()+": true");
             waitForTransactionResponse = new Thread(() -> {
                 try {
                     Thread.sleep(TRANSACTION_RESPONSE_WAIT_TIME);
+                    System.out.println("Requesting detDecision");
                     Server transactionServer = getServerFromHeader(transaction.getCallerHeader());
                     boolean result = transactionServer.getDecision(transaction);
                     if(result) {
@@ -177,6 +185,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     public void doCommit(Transaction transaction) throws RemoteException {
         System.out.println("doCommit: "+transaction.getId());
         if(committed.contains(transaction.getId())) {
+            System.out.println("AlreadyCommitted: "+transaction.getId());
             return;
         }
         committed.add(transaction.getId());
@@ -241,7 +250,6 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                         }
                         canCommitResponseCount++;
                     }
-                    Thread.sleep(5000);
                     if(canCommitList.size() == serverList.size()) {
                         startCommit = true;
                         for(Server server: canCommitList) {
@@ -262,8 +270,6 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                     currentTransaction = null;
                     result = null;
                     transactionResetManager();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             });
             long timeoutTime = System.currentTimeMillis() + TRANSACTION_TIMEOUT;
