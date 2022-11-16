@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import server.command.DeleteCommand;
@@ -137,7 +138,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         copyDB = db.copy();
         currentTransaction = transaction;
         currentTransaction.execute(copyDB);
-        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) {
+        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0 && new Random().nextInt(5) != 0) {
+            System.out.println("canCommit "+transaction.getId()+": true");
             waitForTransactionResponse = new Thread(() -> {
                 try {
                     Thread.sleep(TRANSACTION_RESPONSE_WAIT_TIME);
@@ -157,6 +159,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             waitForTransactionResponse.start();
             return true;
         } else {
+            System.out.println("canCommit "+transaction.getId()+": false");
             copyDB = null;
             currentTransaction = null;
             result = null;
@@ -166,6 +169,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doCommit(Transaction transaction) throws RemoteException {
+        System.out.println("doCommit: "+transaction.getId());
         if(committed.contains(transaction.getId())) {
             return;
         }
@@ -184,6 +188,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doAbort(Transaction transaction) throws RemoteException{
+        System.out.println("doAbort: "+transaction.getId());
         copyDB = null;
         result = null;
         waitForTransactionResponse.interrupt();
@@ -205,32 +210,30 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         synchronized (TRANSACTION_LOCK) {
             Thread transactionThread = new Thread(() -> {
                 try {
-                    int totalCanCommit = 0;
                     List<ServerHeader> headerList = coordinatorServer.getAllServers();
                     List<Server> serverList = new ArrayList<>();
+                    List<Server> canCommitList = new ArrayList<>();
                     for(ServerHeader serverHeader: headerList) {
                         serverList.add(getServerFromHeader(serverHeader));
                     }
                     for(Server server: serverList) {
                         boolean res = server.canCommit(transaction);
                         if(res) {
-                            totalCanCommit++;
-                        } else {
-                            break;
+                            canCommitList.add(server);
                         }
                     }
-                    if(totalCanCommit == serverList.size()) {
+                    if(canCommitList.size() == serverList.size()) {
                         startCommit = true;
                         for(Server server: serverList) {
                             server.doCommit(transaction);
                         }
-                        while(haveCommittedCount!=totalCanCommit) {
+                        while(haveCommittedCount!=serverList.size()) {
                             continue;
                         }
                         haveCommittedCount = 0;
                         startCommit = false;
                     } else {
-                        for(Server server: serverList) {
+                        for(Server server: canCommitList) {
                             server.doAbort(transaction);
                         }
                     }
