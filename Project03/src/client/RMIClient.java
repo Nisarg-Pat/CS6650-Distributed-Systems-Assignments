@@ -16,7 +16,7 @@ public class RMIClient implements Client {
 
     protected final Scanner scanner;
 
-    protected static final int TIMEOUT = 10000; //in milliseconds (= 10 sec)
+    protected static final int SERVER_TIMEOUT = 10000; //in milliseconds (= 10 sec)
 
     protected final Log clientLog;
 
@@ -131,8 +131,8 @@ public class RMIClient implements Client {
 
     private String getOutput(DBRunnable runnable) {
         Thread thread = new Thread(runnable);
+        long timeoutTime = System.currentTimeMillis() + SERVER_TIMEOUT;
         thread.start();
-        long timeoutTime = System.currentTimeMillis() + TIMEOUT;
         while (thread.isAlive()) {
             long currentTime = System.currentTimeMillis();
             if (currentTime >= timeoutTime) {
