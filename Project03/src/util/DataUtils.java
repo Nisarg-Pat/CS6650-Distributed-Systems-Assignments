@@ -34,15 +34,15 @@ public class DataUtils {
    * @param args Command Line Arguments
    */
   public static void validateServerArguments(String[] args) {
-    if (args.length != 1) {
-      System.out.println("Improper number of arguments! Required 1 argument: port");
+    if (args.length != 3) {
+      System.out.println("Improper number of arguments! Required 2 arguments: host port");
       System.exit(1);
     }
 
     try {
-      Integer.parseInt(args[0]);
+      Integer.parseInt(args[1]);
     } catch (NumberFormatException e) {
-      System.out.println(args[0] + " is not a valid port number!!");
+      System.out.println(args[1] + " is not a valid port number!!");
       System.exit(1);
     }
   }

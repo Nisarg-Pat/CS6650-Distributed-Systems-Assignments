@@ -1,14 +1,14 @@
 #!/bin/bash
 
-PROJECT_NETWORK='project2-network'
-SERVER_IMAGE='project2-server-image'
-RMI_SERVER_CONTAINER='my-rmi-server'
+PROJECT_NETWORK='project3-network'
+SERVER_IMAGE='project3-server-image'
 
-if [ $# -ne 0 ]
+if [ $# -ne 3 ]
 then
-  echo "Usage: ./run_server.sh"
+  echo "Usage: ./run_server.sh <server-container-name> <port-number> <coordinator-container-name>"
   exit
 fi
 
-docker run -it --rm --name $RMI_SERVER_CONTAINER \
-   --network $PROJECT_NETWORK $SERVER_IMAGE
+docker run -it --rm --name "$1" \
+   --network $PROJECT_NETWORK $SERVER_IMAGE \
+   java server.RMIServerApp "$1" "$2" "$3"

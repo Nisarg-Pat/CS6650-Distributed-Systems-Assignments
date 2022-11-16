@@ -116,8 +116,12 @@ public class RMIClient implements Client {
                 }
             case "CONNECT":
                 try {
-                    int port = Integer.parseInt(data[1]);
-                    Registry registry = LocateRegistry.getRegistry(this.host, port);
+                    if(data.length!=3) {
+                        return "Invalid format for CONNECT. Expected CONNECT <host> <port>";
+                    }
+                    String host = data[1];
+                    int port = Integer.parseInt(data[2]);
+                    Registry registry = LocateRegistry.getRegistry(host, port);
                     db = (KeyValueDB) registry.lookup("KeyValueDBService");
                     return "Connected to server at port "+ port;
                 } catch (Exception e) {

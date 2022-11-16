@@ -13,10 +13,10 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   private final ServerHeader header;
   List<ServerHeader> serverList;
 
-  protected MyCoordinatorServer(int port) throws RemoteException {
-    super(port);
-    this.port = port;
-    this.header = new ServerHeader("localhost", this.port);
+  protected MyCoordinatorServer(String host) throws RemoteException {
+    super();
+    this.port = CoordinatorServer.PORT;
+    this.header = new ServerHeader(host, this.port);
     serverList = new ArrayList<>();
   }
 
@@ -35,7 +35,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
     try {
       Registry registry = LocateRegistry.createRegistry(port);
       registry.rebind(SERVER_LIST_SERVICE, this);
-      System.out.println("CoordinatorServer started");
+      System.out.println("CoordinatorServer started at host: "+header.getHost()+", port: "+header.getPort());
     } catch (Exception e) {
       System.out.println("Trouble: " + e);
     }

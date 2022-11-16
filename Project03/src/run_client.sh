@@ -1,12 +1,11 @@
 #!/bin/bash
 
-PROJECT_NETWORK='project2-network'
-CLIENT_IMAGE='project2-client-image'
-RMI_CLIENT_CONTAINER='my-rmi-client'
+PROJECT_NETWORK='project3-network'
+CLIENT_IMAGE='project3-client-image'
 
 if [ $# -ne 2 ]
 then
-  echo "Usage: ./run_server.sh <server-container-name> <port-number>"
+  echo "Usage: ./run_client.sh <server-container-name> <port-number>"
   exit
 fi
 

@@ -45,6 +45,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     protected final Log serverLog;
 
+    private final String coordinatorHost;
     protected CoordinatorServer coordinatorServer;
 
     private static final Object TRANSACTION_LOCK = new Object();
@@ -55,10 +56,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
      * @param port port at which the server should listen
      * @throws RemoteException If unable to create instance of remote object db.
      */
-    public RMIServer(int port) throws RemoteException {
+    public RMIServer(String host, int port, String coordinatorHost) throws RemoteException {
         super(port);
         this.port = port;
-        this.header = new ServerHeader("localhost", this.port);
+        this.header = new ServerHeader(host, this.port);
+        this.coordinatorHost = coordinatorHost;
         this.db = new MyKeyValueDB();
         this.db.populate();
         this.serverLog = new Log();
@@ -76,9 +78,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         try {
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("KeyValueDBService", this);
-            System.out.println("RMIServer started at port: "+port);
 
-            Registry coordinatorRegistry = LocateRegistry.getRegistry(CoordinatorServer.PORT);
+            //TODO
+            Registry coordinatorRegistry = LocateRegistry.getRegistry(coordinatorHost, CoordinatorServer.PORT);
             coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
             if(coordinatorServer.getAllServers().size() == 0) {
                 db.populate();
@@ -89,6 +91,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                 db = otherServer.getDBCopy();
             }
             coordinatorServer.addServer(getServerHeader());
+            System.out.println("RMIServer started at host: "+header.getHost()+", port: "+header.getPort());
         } catch (Exception e) {
             e.printStackTrace();
         }

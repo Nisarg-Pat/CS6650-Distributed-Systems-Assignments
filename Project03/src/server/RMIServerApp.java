@@ -15,17 +15,20 @@ public class RMIServerApp {
      * @param args Required args: <port>
      */
     public static void main(String[] args) {
-        //Validates the command line arguments
-        DataUtils.validateServerArguments(args);
 
-        int port = Integer.parseInt(args[0]);
-
-        //Creating the RMI server and calling start
+        //Creating the RMI server/coordinator and calling start
         try {
-            if(port == 9999) {
-                new MyCoordinatorServer(port).start();
+            if(args.length == 1) {
+                String host = args[0];
+                new MyCoordinatorServer(host).start();
+            } else if(args.length == 3){
+                DataUtils.validateServerArguments(args);
+                String host = args[0];
+                int port = Integer.parseInt(args[1]);
+                String coordinatorHost = args[2];
+                new RMIServer(host, port, coordinatorHost).start();
             } else {
-                new RMIServer(port).start();
+                System.out.println("Improper number of arguments");
             }
         } catch (RemoteException e) {
             System.out.println("Server could not start! Reason: " + e.getMessage());
