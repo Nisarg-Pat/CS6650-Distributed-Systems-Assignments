@@ -23,7 +23,7 @@ public interface Server extends Remote { //, Unreferenced {
 
   void doAbort(Transaction transaction) throws RemoteException;
 
-  boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException;
+  void haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException;
 
   boolean getDecision(Transaction transaction) throws RemoteException;
 

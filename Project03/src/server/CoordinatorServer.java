@@ -5,8 +5,8 @@ import java.util.List;
 
 public interface CoordinatorServer extends Server {
 
-  public static final int PORT = 9999;
-  public static final String SERVER_LIST_SERVICE = "ServerListService";
+  int PORT = 9999;
+  String SERVER_LIST_SERVICE = "ServerListService";
 
   void addServer(ServerHeader server) throws RemoteException;
 

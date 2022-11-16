@@ -7,7 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyCoordinatorServer extends UnicastRemoteObject implements CoordinatorServer{
+public class MyCoordinatorServer extends UnicastRemoteObject implements CoordinatorServer {
 
   protected final int port;
   private final ServerHeader header;
@@ -55,8 +55,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   }
 
   @Override
-  public boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
-    return false;
+  public void haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
   }
 
   @Override

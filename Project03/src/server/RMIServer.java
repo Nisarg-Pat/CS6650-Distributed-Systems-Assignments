@@ -128,6 +128,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) {
             return true;
         } else {
+            copyDB = null;
+            currentTransaction = null;
+            result = null;
             return false;
         }
     }
@@ -138,6 +141,12 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         copyDB = null;
         result = currentTransaction.getResult();
         currentTransaction = null;
+        try {
+            getServerFromHeader(transaction.getCallerHeader()).haveCommitted(transaction, this.getServerHeader());
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -148,8 +157,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     }
 
     @Override
-    public boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
-        return false;
+    public void haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
+        haveCommittedCount++;
     }
 
     @Override
@@ -178,13 +187,20 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                 for(Server server: serverList) {
                     server.doCommit(transaction);
                 }
+                while(haveCommittedCount!=totalCanCommit) {
+                    continue;
+                }
+                haveCommittedCount = 0;
             } else {
                 for(Server server: serverList) {
                     server.doAbort(transaction);
                 }
             }
         } catch (RemoteException | NotBoundException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            copyDB = null;
+            currentTransaction = null;
+            result = null;
             return null;
         }
         return result;
