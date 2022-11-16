@@ -1,9 +1,11 @@
 package server;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     protected final int port;
     protected MyKeyValueDB db;
+    private ServerHeader header;
 
     private MyKeyValueDB copyDB;
     private List<Object> result;
@@ -38,6 +41,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     public RMIServer(int port) throws RemoteException {
         super(port);
         this.port = port;
+        this.header = new ServerHeader("localhost", this.port);
         this.db = new MyKeyValueDB();
         this.db.populate();
         this.serverLog = new Log();
@@ -55,9 +59,12 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             if(coordinatorServer.getAllServers().size() == 0) {
                 db.populate();
             } else {
-                db = coordinatorServer.getAllServers().get(0).getDBCopy();
+                ServerHeader otherHeader = coordinatorServer.getAllServers().get(0);
+                Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
+                Server otherServer = (Server) otherServerRegistry.lookup("KeyValueDBService");
+                db = otherServer.getDBCopy();
             }
-            coordinatorServer.addServer(this);
+            coordinatorServer.addServer(getServerHeader());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,7 +139,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     public List<Object> performTransaction(Transaction transaction) throws RemoteException{
         try {
             int totalCanCommit = 0;
-            List<Server> serverList = coordinatorServer.getAllServers();
+            List<ServerHeader> headerList = coordinatorServer.getAllServers();
+            List<Server> serverList = new ArrayList<>();
+            for(ServerHeader serverHeader: headerList) {
+                serverList.add(getServerFromHeader(serverHeader));
+            }
             for(Server server: serverList) {
                 boolean res = server.canCommit(transaction);
                 if(res) {
@@ -152,6 +163,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             }
         } catch (RemoteException e) {
             System.out.println(e.getMessage());
+        } catch (NotBoundException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -159,5 +172,16 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     @Override
     public MyKeyValueDB getDBCopy() throws RemoteException {
         return db.copy();
+    }
+
+    @Override
+    public ServerHeader getServerHeader() throws RemoteException {
+        return header;
+    }
+
+    private Server getServerFromHeader(ServerHeader header) throws RemoteException, NotBoundException {
+        Registry registry = LocateRegistry.getRegistry(header.getHost(), header.getPort());
+        Server server = (Server)registry.lookup("KeyValueDBService");
+        return server;
     }
 }

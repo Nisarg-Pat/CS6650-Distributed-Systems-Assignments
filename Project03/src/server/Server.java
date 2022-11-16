@@ -30,4 +30,6 @@ public interface Server extends Remote { //, Unreferenced {
   List<Object> performTransaction(Transaction transaction) throws RemoteException;
 
   MyKeyValueDB getDBCopy() throws RemoteException;
+
+  ServerHeader getServerHeader() throws RemoteException;
 }

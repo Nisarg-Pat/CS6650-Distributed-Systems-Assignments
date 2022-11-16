@@ -10,21 +10,23 @@ import java.util.List;
 public class MyCoordinatorServer extends UnicastRemoteObject implements CoordinatorServer{
 
   protected final int port;
-  List<Server> serverList;
+  private final ServerHeader header;
+  List<ServerHeader> serverList;
 
   protected MyCoordinatorServer(int port) throws RemoteException {
     super(port);
     this.port = port;
+    this.header = new ServerHeader("localhost", this.port);
     serverList = new ArrayList<>();
   }
 
   @Override
-  public void addServer(Server server) throws RemoteException {
+  public void addServer(ServerHeader server) throws RemoteException {
     serverList.add(server);
   }
 
   @Override
-  public List<Server> getAllServers() throws RemoteException {
+  public List<ServerHeader> getAllServers() throws RemoteException {
     return serverList;
   }
 
@@ -72,5 +74,10 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   @Override
   public MyKeyValueDB getDBCopy() throws RemoteException {
     return null;
+  }
+
+  @Override
+  public ServerHeader getServerHeader() throws RemoteException {
+    return header;
   }
 }
