@@ -47,17 +47,15 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   }
 
   @Override
-  public List<Object> doCommit(Transaction transaction) throws RemoteException {
-    return null;
+  public void doCommit(Transaction transaction) throws RemoteException {
   }
 
   @Override
-  public List<Object> doAbort(Transaction transaction) throws RemoteException {
-    return null;
+  public void doAbort(Transaction transaction) throws RemoteException {
   }
 
   @Override
-  public boolean haveCommitted(Transaction transaction) throws RemoteException {
+  public boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
     return false;
   }
 

@@ -19,11 +19,11 @@ public interface Server extends Remote { //, Unreferenced {
 
   boolean canCommit(Transaction transaction) throws RemoteException;
 
-  List<Object> doCommit(Transaction transaction) throws RemoteException;
+  void doCommit(Transaction transaction) throws RemoteException;
 
-  List<Object> doAbort(Transaction transaction) throws RemoteException;
+  void doAbort(Transaction transaction) throws RemoteException;
 
-  boolean haveCommitted(Transaction transaction) throws RemoteException;
+  boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException;
 
   boolean getDecision(Transaction transaction) throws RemoteException;
 

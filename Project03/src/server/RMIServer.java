@@ -23,10 +23,12 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     protected final int port;
     protected MyKeyValueDB db;
-    private ServerHeader header;
+    private final ServerHeader header;
 
     private MyKeyValueDB copyDB;
+    private Transaction currentTransaction;
     private List<Object> result;
+    private int haveCommittedCount;
 
     protected final Log serverLog;
 
@@ -45,6 +47,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         this.db = new MyKeyValueDB();
         this.db.populate();
         this.serverLog = new Log();
+
+        this.copyDB = null;
+        this.currentTransaction = null;
+        this.result = null;
+        this.haveCommittedCount = 0;
     }
 
     @Override
@@ -80,6 +87,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
         transaction.addCommand(new PutCommand(key, value));
         List<Object> result = performTransaction(transaction);
+        if(result == null || result.size() == 0) {
+            return false;
+        }
         return (boolean) result.get(0);
     }
 
@@ -88,6 +98,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
         transaction.addCommand(new DeleteCommand(key));
         List<Object> result = performTransaction(transaction);
+        if(result == null || result.size() == 0) {
+            return false;
+        }
         return (boolean) result.get(0);
     }
 
@@ -102,10 +115,17 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     }
 
     @Override
-    public boolean canCommit(Transaction transaction) throws RemoteException{
+    public boolean canCommit(Transaction transaction) throws RemoteException {
+        if(transaction == null) {
+            return false;
+        }
+        while(currentTransaction != null) {
+            continue;
+        }
         copyDB = db.copy();
-        result = transaction.execute(copyDB);
-        if(result!=null && result.size()!=0) {
+        currentTransaction = transaction;
+        currentTransaction.execute(copyDB);
+        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) {
             return true;
         } else {
             return false;
@@ -113,20 +133,22 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     }
 
     @Override
-    public List<Object> doCommit(Transaction transaction) throws RemoteException{
+    public void doCommit(Transaction transaction) throws RemoteException {
         db = copyDB;
         copyDB = null;
-        return result;
+        result = currentTransaction.getResult();
+        currentTransaction = null;
     }
 
     @Override
-    public List<Object> doAbort(Transaction transaction) throws RemoteException{
+    public void doAbort(Transaction transaction) throws RemoteException{
         copyDB = null;
-        return null;
+        result = null;
+        currentTransaction = null;
     }
 
     @Override
-    public boolean haveCommitted(Transaction transaction) throws RemoteException{
+    public boolean haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
         return false;
     }
 
@@ -161,10 +183,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                     server.doAbort(transaction);
                 }
             }
-        } catch (RemoteException e) {
+        } catch (RemoteException | NotBoundException e) {
             System.out.println(e.getMessage());
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
         return result;
     }
