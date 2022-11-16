@@ -1,5 +1,6 @@
 package server;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import util.KeyValueDB;
 /**
  * A simple implementation of Key-Value Database.
  */
-public class MyKeyValueDB {
+public class MyKeyValueDB implements Serializable {
 
     private final Map<String, String> map;
 

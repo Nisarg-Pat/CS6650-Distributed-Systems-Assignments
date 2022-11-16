@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.Unreferenced;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An instance of a Server.
@@ -22,9 +23,11 @@ public interface Server extends Remote { //, Unreferenced {
 
   List<Object> doAbort(Transaction transaction) throws RemoteException;
 
-  boolean haveCommited(Transaction transaction) throws RemoteException;
+  boolean haveCommitted(Transaction transaction) throws RemoteException;
 
   boolean getDecision(Transaction transaction) throws RemoteException;
 
   List<Object> performTransaction(Transaction transaction) throws RemoteException;
+
+  MyKeyValueDB getDBCopy() throws RemoteException;
 }

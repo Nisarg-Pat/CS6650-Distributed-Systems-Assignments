@@ -5,6 +5,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 
 import server.command.DeleteCommand;
 import server.command.GetCommand;
@@ -19,7 +20,7 @@ import util.Log;
 class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     protected final int port;
-    protected final MyKeyValueDB db;
+    protected MyKeyValueDB db;
 
     protected final Log serverLog;
 
@@ -42,15 +43,18 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     @Override
     public void start() throws RemoteException {
         try {
-            db.populate();
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("KeyValueDBService", this);
             System.out.println("RMIServer started");
 
             Registry coordinatorRegistry = LocateRegistry.getRegistry(CoordinatorServer.PORT);
             coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
+            if(coordinatorServer.getAllServers().size() == 0) {
+                db.populate();
+            } else {
+                db = coordinatorServer.getAllServers().get(0).getDBCopy();
+            }
             coordinatorServer.addServer(this);
-            System.out.println(coordinatorServer.getAllServers());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,7 +105,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     }
 
     @Override
-    public boolean haveCommited(Transaction transaction) throws RemoteException{
+    public boolean haveCommitted(Transaction transaction) throws RemoteException{
         return false;
     }
 
@@ -121,5 +125,10 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             System.out.println(e.getMessage());
         }
         return result;
+    }
+
+    @Override
+    public MyKeyValueDB getDBCopy() throws RemoteException {
+        return db.copy();
     }
 }

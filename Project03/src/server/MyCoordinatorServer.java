@@ -55,7 +55,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   }
 
   @Override
-  public boolean haveCommited(Transaction transaction) throws RemoteException {
+  public boolean haveCommitted(Transaction transaction) throws RemoteException {
     return false;
   }
 
@@ -66,6 +66,11 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
   @Override
   public List<Object> performTransaction(Transaction transaction) throws RemoteException {
+    return null;
+  }
+
+  @Override
+  public MyKeyValueDB getDBCopy() throws RemoteException {
     return null;
   }
 }
