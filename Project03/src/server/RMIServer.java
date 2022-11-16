@@ -77,7 +77,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public boolean put(String key, String value) throws RemoteException {
-        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis());
+        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
         transaction.addCommand(new PutCommand(key, value));
         List<Object> result = performTransaction(transaction);
         return (boolean) result.get(0);
@@ -85,7 +85,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public boolean delete(String key) throws RemoteException {
-        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis());
+        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
         transaction.addCommand(new DeleteCommand(key));
         List<Object> result = performTransaction(transaction);
         return (boolean) result.get(0);

@@ -7,12 +7,14 @@ import java.util.List;
 import server.command.Command;
 
 class Transaction implements Serializable {
+  private final ServerHeader callerHeader;
   private final String id;
   private final List<Command> commandList;
   private final List<Object> result;
 
-  Transaction(String id) {
+  Transaction(String id, ServerHeader callerHeader) {
     this.id = id;
+    this.callerHeader = callerHeader;
     commandList = new ArrayList<>();
     result = new ArrayList<>();
   }
@@ -38,5 +40,9 @@ class Transaction implements Serializable {
       result.add(command.execute(db));
     }
     return result;
+  }
+
+  public ServerHeader getCallerHeader() {
+    return callerHeader;
   }
 }
