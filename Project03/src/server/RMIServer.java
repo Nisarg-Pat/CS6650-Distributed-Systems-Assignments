@@ -40,6 +40,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     protected CoordinatorServer coordinatorServer;
 
+    private static final Object TRANSACTION_LOCK = new Object();
+
     /**
      * Constructor for RMIServer
      *
@@ -125,7 +127,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     Thread waitForTransactionResponse = null;
 
     @Override
-    public boolean canCommit(Transaction transaction) throws RemoteException {
+    public synchronized boolean canCommit(Transaction transaction) throws RemoteException {
         if(transaction == null) {
             return false;
         }
@@ -146,8 +148,10 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                     } else {
                         doAbort(transaction);
                     }
-                } catch (RemoteException | NotBoundException | InterruptedException e) {
+                } catch (RemoteException | NotBoundException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    //Empty
                 }
             });
             waitForTransactionResponse.start();
@@ -169,8 +173,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         db = copyDB;
         copyDB = null;
         result = currentTransaction.getResult();
-        currentTransaction = null;
         waitForTransactionResponse.interrupt();
+        currentTransaction = null;
         try {
             getServerFromHeader(transaction.getCallerHeader()).haveCommitted(transaction, this.getServerHeader());
         } catch (NotBoundException e) {
@@ -182,8 +186,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     public void doAbort(Transaction transaction) throws RemoteException{
         copyDB = null;
         result = null;
-        currentTransaction = null;
         waitForTransactionResponse.interrupt();
+        currentTransaction = null;
     }
 
     @Override
@@ -198,57 +202,59 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public List<Object> performTransaction(Transaction transaction) throws RemoteException {
-        Thread transactionThread = new Thread(() -> {
-            try {
-                int totalCanCommit = 0;
-                List<ServerHeader> headerList = coordinatorServer.getAllServers();
-                List<Server> serverList = new ArrayList<>();
-                for(ServerHeader serverHeader: headerList) {
-                    serverList.add(getServerFromHeader(serverHeader));
-                }
-                for(Server server: serverList) {
-                    boolean res = server.canCommit(transaction);
-                    if(res) {
-                        totalCanCommit++;
+        synchronized (TRANSACTION_LOCK) {
+            Thread transactionThread = new Thread(() -> {
+                try {
+                    int totalCanCommit = 0;
+                    List<ServerHeader> headerList = coordinatorServer.getAllServers();
+                    List<Server> serverList = new ArrayList<>();
+                    for(ServerHeader serverHeader: headerList) {
+                        serverList.add(getServerFromHeader(serverHeader));
+                    }
+                    for(Server server: serverList) {
+                        boolean res = server.canCommit(transaction);
+                        if(res) {
+                            totalCanCommit++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if(totalCanCommit == serverList.size()) {
+                        startCommit = true;
+                        for(Server server: serverList) {
+                            server.doCommit(transaction);
+                        }
+                        while(haveCommittedCount!=totalCanCommit) {
+                            continue;
+                        }
+                        haveCommittedCount = 0;
+                        startCommit = false;
                     } else {
-                        break;
+                        for(Server server: serverList) {
+                            server.doAbort(transaction);
+                        }
                     }
+                } catch (RemoteException | NotBoundException e) {
+                    e.printStackTrace();
+                    copyDB = null;
+                    currentTransaction = null;
+                    result = null;
                 }
-                if(totalCanCommit == serverList.size()) {
-                    startCommit = true;
-                    for(Server server: serverList) {
-                        server.doCommit(transaction);
-                    }
-                    while(haveCommittedCount!=totalCanCommit) {
-                        continue;
-                    }
-                    haveCommittedCount = 0;
-                    startCommit = false;
-                } else {
-                    for(Server server: serverList) {
-                        server.doAbort(transaction);
-                    }
+            });
+            long timeoutTime = System.currentTimeMillis() + TRANSACTION_TIMEOUT;
+            transactionThread.start();
+            while (transactionThread.isAlive()) {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime >= timeoutTime) {
+                    copyDB = null;
+                    currentTransaction = null;
+                    result = null;
+                    transactionThread.interrupt();
+                    break;
                 }
-            } catch (RemoteException | NotBoundException e) {
-                e.printStackTrace();
-                copyDB = null;
-                currentTransaction = null;
-                result = null;
             }
-        });
-        long timeoutTime = System.currentTimeMillis() + TRANSACTION_TIMEOUT;
-        transactionThread.start();
-        while (transactionThread.isAlive()) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime >= timeoutTime) {
-                copyDB = null;
-                currentTransaction = null;
-                result = null;
-                transactionThread.interrupt();
-                break;
-            }
+            return result;
         }
-        return result;
     }
 
     @Override
