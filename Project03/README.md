@@ -90,8 +90,9 @@ Client can perform one of the following commands on the terminal:
 ## Examples and Sample Images
 
 Sample images of client/server interaction is present in the res/Screenshots folder.
-1) RMIServer.png: How to run the RMIServerApp
-2) RMIClient1.png and RMIClient2.png: Sample images showing to run RMIClient and how data is shown in RMIClientApp.
+1) Coordinator.png: How to run the Coordinator
+2) RMIServer.png: How to run the RMIServerApp
+3) RMIClient.png: Sample images showing to run RMIClient and how data is shown in RMIClientApp.
 
 
 ## Limitations
