@@ -43,9 +43,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     private int haveCommittedCount;
     private boolean startCommit;
 
+    //For Coordinator Server
     private final String coordinatorHost;
     protected CoordinatorServer coordinatorServer;
 
+    //Lock for transaction
     private static final Object TRANSACTION_LOCK = new Object();
 
     /**
@@ -76,10 +78,14 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("KeyValueDBService", this);
 
-            //TODO
+            //Locating the coordinator
             Registry coordinatorRegistry = LocateRegistry.getRegistry(coordinatorHost, CoordinatorServer.PORT);
             coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
+
+            //Getting currentList of servers
             List<ServerHeader> allServers = coordinatorServer.getAllServers();
+
+            //Replicating db as one of the servers else initializing
             if(allServers.size() == 0) {
                 db.populate();
             } else {
@@ -95,11 +101,13 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         }
     }
 
+    //Get command not requiring distributed transaction
     @Override
     public String get(String key) throws RemoteException {
         return (String) new GetCommand(key).execute(db);
     }
 
+    //Put command as a distributed transaction
     @Override
     public boolean put(String key, String value) throws RemoteException {
         Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
@@ -111,6 +119,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         return (boolean) result.get(0);
     }
 
+    //Delete command as a distributed transaction
     @Override
     public boolean delete(String key) throws RemoteException {
         Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
@@ -132,7 +141,20 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         return db.getString();
     }
 
+    @Override
+    public MyKeyValueDB getDBCopy() throws RemoteException {
+        return db.copy();
+    }
 
+    @Override
+    public ServerHeader getServerHeader() throws RemoteException {
+        return header;
+    }
+
+
+    //
+    //Start of distributed transaction algorithm and methods
+    //
 
     @Override
     public synchronized boolean canCommit(Transaction transaction) throws RemoteException {
@@ -142,6 +164,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         while(currentTransaction != null) {
             continue;
         }
+        //In memory copy of the database
         copyDB = db.copy();
         currentTransaction = transaction;
         currentTransaction.execute(copyDB);
@@ -152,8 +175,11 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 //        } catch (InterruptedException e) {
 //            throw new RuntimeException(e);
 //        }
+
+        //Can commit the transaction
         if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) { //&& new Random().nextInt(10) != 0) {
             Log.logln("canCommit "+transaction.getId()+": true");
+            //Waiting for reply from the manager to either commit or abort
             waitForTransactionResponse = new Thread(() -> {
                 try {
                     Thread.sleep(TRANSACTION_RESPONSE_WAIT_TIME);
@@ -174,6 +200,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             waitForTransactionResponse.start();
             return true;
         } else {
+            //Cannot commit the transaction. Abort immediately
             Log.logln("canCommit "+transaction.getId()+": false");
             copyDB = null;
             currentTransaction = null;
@@ -184,6 +211,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doCommit(Transaction transaction) throws RemoteException {
+        //Commit the transaction
         Log.logln("doCommit: "+transaction.getId());
         if(committed.contains(transaction.getId())) {
             Log.logln("AlreadyCommitted: "+transaction.getId());
@@ -200,6 +228,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         }
         currentTransaction = null;
         try {
+            //Send a haveCommited message to Manager.
             getServerFromHeader(transaction.getCallerHeader()).haveCommitted(transaction, this.getServerHeader());
         } catch (NotBoundException e) {
             e.printStackTrace();
@@ -208,6 +237,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doAbort(Transaction transaction) throws RemoteException{
+        //Abort the transaction
         Log.logln("doAbort: "+transaction.getId());
         copyDB = null;
         result = null;
@@ -220,11 +250,13 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void haveCommitted(Transaction transaction, ServerHeader header) throws RemoteException {
+        //Received a havec ommited message, increment the counter.
         haveCommittedCount++;
     }
 
     @Override
     public boolean getDecision(Transaction transaction) throws RemoteException{
+        //Server asking for a decision to commit or not to manager.
         Log.logln("getDecision: "+transaction.getId());
         while(canCommitResponseCount != serverCount) {
             continue;
@@ -237,6 +269,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         synchronized (TRANSACTION_LOCK) {
             Thread transactionThread = new Thread(() -> {
                 try {
+                    //Getting the list of active servers.
                     List<ServerHeader> headerList = coordinatorServer.getAllServers();
                     List<Server> serverList = new ArrayList<>();
                     List<Server> canCommitList = new ArrayList<>();
@@ -244,6 +277,8 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                         serverList.add(getServerFromHeader(serverHeader));
                     }
                     serverCount = serverList.size();
+
+                    //Voting phase
                     for(Server server: serverList) {
                         boolean res = server.canCommit(transaction);
                         if(res) {
@@ -251,7 +286,10 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                         }
                         canCommitResponseCount++;
                     }
+
+                    //Completion according to outcome phase
                     if(canCommitList.size() == serverList.size()) {
+                        //doCommit
                         startCommit = true;
                         for(Server server: canCommitList) {
                             server.doCommit(transaction);
@@ -260,6 +298,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                             continue;
                         }
                     } else {
+                        //doAbort
                         for(Server server: canCommitList) {
                             server.doAbort(transaction);
                         }
@@ -273,6 +312,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
                     transactionResetManager();
                 }
             });
+            //Timeout mechanism
             long timeoutTime = System.currentTimeMillis() + TRANSACTION_TIMEOUT;
             transactionThread.start();
             while (transactionThread.isAlive()) {
@@ -288,17 +328,6 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             return result;
         }
     }
-
-    @Override
-    public MyKeyValueDB getDBCopy() throws RemoteException {
-        return db.copy();
-    }
-
-    @Override
-    public ServerHeader getServerHeader() throws RemoteException {
-        return header;
-    }
-
     private Server getServerFromHeader(ServerHeader header) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry(header.getHost(), header.getPort());
         Server server = (Server)registry.lookup("KeyValueDBService");

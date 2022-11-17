@@ -40,6 +40,8 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
   @Override
   public List<ServerHeader> getAllServers() throws RemoteException {
+    //Temporary set of not accessible servers
+    //To get accurate list of running servers
     Set<ServerHeader> removedSet = new HashSet<>();
     for(ServerHeader serverHeader: serverSet) {
         tempServer = null;
@@ -61,12 +63,15 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
           }
         }
         if(tempServer == null) {
+          //If unable to find the server, remove it
           removedSet.add(serverHeader);
         }
     }
     for(ServerHeader serverHeader: removedSet) {
+      //Removing the servers
       serverSet.remove(serverHeader);
     }
+    //Printing the current server size.
     Log.logln("Current server size: "+serverSet.size());
     return new ArrayList<>(serverSet);
   }

@@ -19,9 +19,11 @@ public class RMIServerApp {
         //Creating the RMI server/coordinator and calling start
         try {
             if(args.length == 1) {
+                //It is a Coordinator
                 String host = args[0];
                 new MyCoordinatorServer(host).start();
             } else if(args.length == 3){
+                //It is a RMIServer
                 DataUtils.validateServerArguments(args);
                 String host = args[0];
                 int port = Integer.parseInt(args[1]);
