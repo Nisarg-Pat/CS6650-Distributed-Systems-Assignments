@@ -1,2 +1,14 @@
 Technical Impression:
 
+The requirements of the projects can be divided into three parts:
+1) Replicating the servers and starting each with consistent data.
+2) Handling the cases where new server gets added or removed when the application is running.
+3) Implementing the Two-Phase Commit Algorithm for data consistency.
+
+The first part was the easiest of the three according to me as per my implementation, I can create multiple servers with just minor modifications. Also, the client app was changed minimally throughout the project as all of the changes were related to the server.
+
+The second part was the most difficult for me to understand how it can be achieved as the only question I can come up with my different implementations were how would other server know that a particular server crashed or started running Eventually I figured out the need of a coordinator server that can keep track of all the active servers, as when new server starts, it can add itself to the server list in the coordinator. But the issue of server crash report was still remaining as no server can inform the coordinator about the crash. For this, I required help of a TA and with the suggestion of tradeoff of number of message transmissions, I implemented the server list such that any call to get the list will first check the status of the servers first and remove any unreachable ones.
+
+For the Two-Phase Commit Protocol, I followed the textbook for most of the part. It was easily understandable algorithm, but some minor issues did occur when implementing it. Like for the Transactions, I had to make changes to my commands in such a way that it can be added in a transaction class and that class when executed, gets executed completely.
+
+Overall, it was a challenging assignment, but it did include a lot of learning in it. I am satisfied with how my application works with data replications and distributed transactions.
