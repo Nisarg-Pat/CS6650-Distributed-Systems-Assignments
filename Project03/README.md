@@ -1,25 +1,31 @@
-# P-2 Multi-threaded Key-Value Store using RPC
+# P-3 Distributed Key-Value Store
 
 ## Overview
 
 This project implements a basic multi-threaded server which serves as a key-value store and
 responds to the requests made by clients using Remote Method Invocation in Java. The remote object is binded to 
 rmiregistry created before starting the server.
+Multiple servers can be replicated and client can acces any of them to perform consistent operations on the system.
 
 ## List of Features of the Client
 These are the features of the client applications:
 
 * Clients accept the host name and the port number of the rmiregistry.
 * Clients are robust to server failure. It displays a timeout if it does not get response
-  within 10 seconds.
+  within 20 seconds.
 * Clients are robust to malformed data packets. It displays error message if the response
   is not in proper format.
 * Every request from the client and responses given by the server is timestamped to millisecond
   precision and logged in client console.
+* Client can change the server through which it communicates in between the run.
 
 ## List of Features of the Server
 These are the features of server application:
 
+* Multiple replicas of server can be available at any time.
+* Data is consistent among all the servers with the help of distributed transactions (two-phase commit protocol).
+* Server can close(crash) or restart with the data remaining consistent with the running servers.
+* A Coordinator server is present that maintains a list of all the running servers.
 * Server takes the port number of the rmiregistry on which it has to bind the service
   as a command line argument. Rmiregistry and server run on the same machine.
 * Server binds the KeyStoreDB object to the rmiregistry.
@@ -35,12 +41,21 @@ Follow these steps to run the applications using docker:
    > $ cd src
 2) Run the deploy.sh bash files to create docker images
    > $ ./deploy.sh
-3) Run the RMI server application using run_server.sh bash file
-   > $ ./run_server.sh
-4) The RMIRegistry runs on my-rmi-server container and at port 1234. 
-   Run the RMI client application using run_client.sh bash file with server-container-name,
+3) Run the Coordinator server application using run_coordinator.sh bash file. NOTE: The coordinator has to run before starting any other server.
+   > $ ./run_coordinator.sh
+4) Run the RMI server application using run_server.sh bash file by providing the server-name and port. Start multiple such servers on different terminals. 5 such servers can be
+   > $ ./run_server.sh server1 1231
+
+   > $ ./run_server.sh server2 1232
+
+   > $ ./run_server.sh server3 1233
+
+   > $ ./run_server.sh server4 1234
+
+   > $ ./run_server.sh server5 1235
+5) Run the RMI client application using run_client.sh bash file with any running server-name,
    and port number as arguments in a different terminal.
-   > $ ./run_client.sh my-rmi-server 1234
+   > $ ./run_client.sh server1 1231
 5) The server and client are ready to communicate. You can create multiple clients and interact with server.
 
 Note: If any of the bash files does not execute, try using bash before ./*.sh
