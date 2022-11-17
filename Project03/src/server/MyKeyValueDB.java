@@ -9,7 +9,7 @@ import java.util.Map;
 import util.KeyValueDB;
 
 /**
- * A simple implementation of Key-Value Database.
+ * The database of the server.
  */
 public class MyKeyValueDB implements Serializable {
 
@@ -28,6 +28,10 @@ public class MyKeyValueDB implements Serializable {
         map = new HashMap<>();
     }
 
+    /**
+     * Returns a copy of the database
+     * @return A copy of the database
+     */
     public MyKeyValueDB copy() {
 
         synchronized (LOCK) {
@@ -39,6 +43,9 @@ public class MyKeyValueDB implements Serializable {
         }
     }
 
+    /**
+     * Thread safe get operation
+     */
     public String get(String key) {
 
         synchronized (LOCK) {
@@ -50,6 +57,9 @@ public class MyKeyValueDB implements Serializable {
 
     }
 
+    /**
+     * Thread safe put operation
+     */
     public boolean put(String key, String value) {
 
 
@@ -63,6 +73,9 @@ public class MyKeyValueDB implements Serializable {
 
     }
 
+    /**
+     * Thread safe delete operation
+     */
     public boolean delete(String key) {
 
         synchronized (LOCK) {
@@ -75,21 +88,29 @@ public class MyKeyValueDB implements Serializable {
 
     }
 
+    /**
+     * Adding random values to the db
+     */
     public void populate() {
-        map.put("Hello", "World");
-        map.put("Accept", "Refuse");
-        map.put("Answer", "Question");
-        map.put("Abundant", "Scarce");
-        map.put("Calm", "Furious");
-        map.put("Expensive", "Cheap");
-        map.put("Friend", "Enemy");
-        map.put("Happy", "Sad");
-        map.put("Inferior", "Superior");
-        map.put("Possible", "Impossible");
-        map.put("Serious", "Trivial");
-        map.put("Strong", "Weak");
+        put("Hello", "World");
+        put("Accept", "Refuse");
+        put("Answer", "Question");
+        put("Abundant", "Scarce");
+        put("Calm", "Furious");
+        put("Expensive", "Cheap");
+        put("Friend", "Enemy");
+        put("Happy", "Sad");
+        put("Inferior", "Superior");
+        put("Possible", "Impossible");
+        put("Serious", "Trivial");
+        put("Strong", "Weak");
     }
 
+    /**
+     * Returns the contents of database
+     *
+     * @return the contents of database in String format
+     */
     public String getString() {
         StringBuilder sb = new StringBuilder();
         for (String key : map.keySet()) {

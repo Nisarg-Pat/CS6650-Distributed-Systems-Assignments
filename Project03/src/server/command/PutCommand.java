@@ -2,6 +2,9 @@ package server.command;
 
 import server.MyKeyValueDB;
 
+/**
+ * Put command that updates/create a key-value pair.
+ */
 public class PutCommand implements Command{
   private final String key;
   private final String value;

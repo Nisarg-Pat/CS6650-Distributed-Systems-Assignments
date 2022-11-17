@@ -44,7 +44,7 @@ public class RMIClient implements Client {
 
         Registry registry = LocateRegistry.getRegistry(this.host, this.port);
         db = (KeyValueDB) registry.lookup("KeyValueDBService");
-        this.connected = true;
+        connected = true;
 
         //Creating a log file
         clientLog.createFile("TCPClientLog.txt");
@@ -116,6 +116,7 @@ public class RMIClient implements Client {
                 }
             case "CONNECT":
                 try {
+                    //Connects to a server with given parameters: host and port.
                     if(data.length!=3) {
                         return "Invalid format for CONNECT. Expected CONNECT <host> <port>";
                     }
@@ -125,11 +126,11 @@ public class RMIClient implements Client {
                     db = (KeyValueDB) registry.lookup("KeyValueDBService");
                     return "Connected to server at port "+ port;
                 } catch (Exception e) {
-                    return "Error connecting to the server at port "+ data[1];
+                    return String.format("Error connecting to the server at %s:%s. Please check the details.", data[1], data[2]);
                 }
             default:
                 //Improper request from client or command not recognized
-                return "Received malformed request from client!!";
+                return "Received malformed request!!";
         }
     }
 
@@ -176,6 +177,7 @@ public class RMIClient implements Client {
         return data.length == 3;
     }
 
+    //Runnable to add the timeout feature for all the three commands.
     abstract static class DBRunnable implements Runnable {
         String returnValue;
 

@@ -7,9 +7,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of Coordinator Server. It's function is to store the details of all the servers in the application.
+ * Should run before any other server starts
+ */
 public class MyCoordinatorServer extends UnicastRemoteObject implements CoordinatorServer {
 
-  protected final int port;
+  private final int port;
   private final ServerHeader header;
   List<ServerHeader> serverList;
 

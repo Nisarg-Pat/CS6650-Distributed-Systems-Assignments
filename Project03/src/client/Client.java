@@ -15,7 +15,7 @@ public interface Client {
    * DELETE <key> - Deletes the key
    * QUIT - Closes the client
    *
-   * @throws IOException
+   * @throws RemoteException
    */
   void execute() throws RemoteException;
 

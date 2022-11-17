@@ -2,6 +2,9 @@ package server.command;
 
 import server.MyKeyValueDB;
 
+/**
+ * Delete command that removes the key.
+ */
 public class DeleteCommand implements Command {
   private final String key;
 
