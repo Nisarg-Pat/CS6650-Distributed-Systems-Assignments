@@ -24,7 +24,7 @@ import util.Log;
  */
 class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
-    private static final int TRANSACTION_TIMEOUT = 5000; //5000 ms = 5 sec
+    private static final int TRANSACTION_TIMEOUT = 10000; //10000 ms = 10 sec
     private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
     protected MyKeyValueDB db;
@@ -42,8 +42,6 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
     private int canCommitResponseCount;
     private int haveCommittedCount;
     private boolean startCommit;
-
-    protected final Log serverLog;
 
     private final String coordinatorHost;
     protected CoordinatorServer coordinatorServer;
@@ -63,7 +61,6 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         this.coordinatorHost = coordinatorHost;
         this.db = new MyKeyValueDB();
         this.db.populate();
-        this.serverLog = new Log();
 
         this.copyDB = null;
         this.currentTransaction = null;
@@ -82,16 +79,17 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             //TODO
             Registry coordinatorRegistry = LocateRegistry.getRegistry(coordinatorHost, CoordinatorServer.PORT);
             coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
-            if(coordinatorServer.getAllServers().size() == 0) {
+            List<ServerHeader> allServers = coordinatorServer.getAllServers();
+            if(allServers.size() == 0) {
                 db.populate();
             } else {
-                ServerHeader otherHeader = coordinatorServer.getAllServers().get(0);
+                ServerHeader otherHeader = allServers.get(0);
                 Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
                 Server otherServer = (Server) otherServerRegistry.lookup("KeyValueDBService");
                 db = otherServer.getDBCopy();
             }
             coordinatorServer.addServer(getServerHeader());
-            System.out.println("RMIServer started at host: "+header.getHost()+", port: "+header.getPort());
+            Log.logln("RMIServer started at host: "+header.getHost()+", port: "+header.getPort());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,19 +145,19 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         copyDB = db.copy();
         currentTransaction = transaction;
         currentTransaction.execute(copyDB);
-        try {
-            int delay = new Random().nextInt(1000);
-            System.out.println(delay);
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0 && new Random().nextInt(10) != 0) {
-            System.out.println("canCommit "+transaction.getId()+": true");
+//        try {
+//            int delay = new Random().nextInt(1000);
+//            Log.logln(delay);
+//            Thread.sleep(delay);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+        if(currentTransaction.getResult()!=null && currentTransaction.getResult().size()!=0) { //&& new Random().nextInt(10) != 0) {
+            Log.logln("canCommit "+transaction.getId()+": true");
             waitForTransactionResponse = new Thread(() -> {
                 try {
                     Thread.sleep(TRANSACTION_RESPONSE_WAIT_TIME);
-                    System.out.println("Requesting detDecision");
+                    Log.logln("Requesting detDecision");
                     Server transactionServer = getServerFromHeader(transaction.getCallerHeader());
                     boolean result = transactionServer.getDecision(transaction);
                     if(result) {
@@ -176,7 +174,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
             waitForTransactionResponse.start();
             return true;
         } else {
-            System.out.println("canCommit "+transaction.getId()+": false");
+            Log.logln("canCommit "+transaction.getId()+": false");
             copyDB = null;
             currentTransaction = null;
             result = null;
@@ -186,9 +184,9 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doCommit(Transaction transaction) throws RemoteException {
-        System.out.println("doCommit: "+transaction.getId());
+        Log.logln("doCommit: "+transaction.getId());
         if(committed.contains(transaction.getId())) {
-            System.out.println("AlreadyCommitted: "+transaction.getId());
+            Log.logln("AlreadyCommitted: "+transaction.getId());
             return;
         }
         committed.add(transaction.getId());
@@ -210,7 +208,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public void doAbort(Transaction transaction) throws RemoteException{
-        System.out.println("doAbort: "+transaction.getId());
+        Log.logln("doAbort: "+transaction.getId());
         copyDB = null;
         result = null;
         if(waitForTransactionResponse!=null && waitForTransactionResponse.isAlive()) {
@@ -227,7 +225,7 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
 
     @Override
     public boolean getDecision(Transaction transaction) throws RemoteException{
-        System.out.println("getDecision: "+transaction.getId());
+        Log.logln("getDecision: "+transaction.getId());
         while(canCommitResponseCount != serverCount) {
             continue;
         }
@@ -312,9 +310,5 @@ class RMIServer extends UnicastRemoteObject implements KeyValueDB, Server{
         canCommitResponseCount = 0;
         haveCommittedCount = 0;
         startCommit = false;
-    }
-
-    private void transactionResetServer() {
-
     }
 }

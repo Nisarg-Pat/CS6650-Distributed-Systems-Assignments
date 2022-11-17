@@ -27,7 +27,7 @@ public class RMIClientApp {
             Client client = new RMIClient(host, port);
             client.execute();
         } catch (NotBoundException | RemoteException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error starting client: "+e.getMessage());
         }
     }
 }

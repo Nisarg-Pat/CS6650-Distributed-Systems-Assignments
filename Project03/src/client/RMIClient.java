@@ -16,9 +16,7 @@ public class RMIClient implements Client {
 
     protected final Scanner scanner;
 
-    protected static final int SERVER_TIMEOUT = 10000; //in milliseconds (= 10 sec)
-
-    protected final Log clientLog;
+    protected static final int SERVER_TIMEOUT = 20000; //in milliseconds (= 20 sec)
 
     private final String host;
     private final int port;
@@ -40,44 +38,40 @@ public class RMIClient implements Client {
         this.port = port;
 
         scanner = new Scanner(System.in);
-        clientLog = new Log();
 
         Registry registry = LocateRegistry.getRegistry(this.host, this.port);
         db = (KeyValueDB) registry.lookup("KeyValueDBService");
         connected = true;
-
-        //Creating a log file
-        clientLog.createFile("TCPClientLog.txt");
-//        clientLog.logln(String.format("Connected to server at %s:%s", host, port));
+        
+//        Log.logln(String.format("Connected to server at %s:%s", host, port));
     }
 
     @Override
     public void execute() throws RemoteException {
         try {
-            clientLog.logln("Database Content(Key, Value):\n" + db.getString());
+            Log.logln("Database Content(Key, Value):\n" + db.getString());
         } catch (RemoteException e) {
-            clientLog.logln(e.getMessage());
+            Log.logln(e.getMessage());
         }
 
-        clientLog.logln("Possible commands: PUT/GET/DELETE/QUIT\n");
+        Log.logln("Possible commands: PUT/GET/DELETE/QUIT\n");
         String input = "";
         try {
             while (connected) {
                 //Taking client request
-                clientLog.log("Command: ");
+                Log.log("Command: ");
                 input = scanner.nextLine();
-                clientLog.logOnly(input);
                 if (input.equals("QUIT")) {
                     break;
                 }
                 //Requesting to the server
                 String output = processRequest(input);
-                clientLog.logln("Response: " + output);
+                Log.logln("Response: " + output);
             }
         } catch (Exception e) {
             //Empty catch for cntl+C
         }
-        clientLog.logln("Connection to server closed!");
+        Log.logln("Connection to server closed!");
     }
 
     private String processRequest(String input) {

@@ -1,11 +1,17 @@
 package server;
 
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import util.Log;
 
 /**
  * Implementation of Coordinator Server. It's function is to store the details of all the servers in the application.
@@ -15,23 +21,54 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
   private final int port;
   private final ServerHeader header;
-  List<ServerHeader> serverList;
+  Set<ServerHeader> serverSet;
+  private Server tempServer;
+
+  private static final int GET_TIMEOUT = 1000;
 
   protected MyCoordinatorServer(String host) throws RemoteException {
     super();
     this.port = CoordinatorServer.PORT;
     this.header = new ServerHeader(host, this.port);
-    serverList = new ArrayList<>();
+    serverSet = new HashSet<>();
   }
 
   @Override
   public void addServer(ServerHeader server) throws RemoteException {
-    serverList.add(server);
+    serverSet.add(server);
   }
 
   @Override
   public List<ServerHeader> getAllServers() throws RemoteException {
-    return serverList;
+    Set<ServerHeader> removedSet = new HashSet<>();
+    for(ServerHeader serverHeader: serverSet) {
+        tempServer = null;
+        Thread lookupTimeOut = new Thread(() -> {
+          try {
+            Registry registry = LocateRegistry.getRegistry(serverHeader.getHost(), serverHeader.getPort());
+            tempServer = (Server) registry.lookup("KeyValueDBService");
+          } catch (NotBoundException | RemoteException e) {
+            tempServer = null;
+          }
+        });
+        long timeoutTime = System.currentTimeMillis() + GET_TIMEOUT;
+        lookupTimeOut.start();
+        while (lookupTimeOut.isAlive()) {
+          long currentTime = System.currentTimeMillis();
+          if (currentTime >= timeoutTime) {
+            lookupTimeOut.interrupt();
+            break;
+          }
+        }
+        if(tempServer == null) {
+          removedSet.add(serverHeader);
+        }
+    }
+    for(ServerHeader serverHeader: removedSet) {
+      serverSet.remove(serverHeader);
+    }
+    Log.logln("Current server size: "+serverSet.size());
+    return new ArrayList<>(serverSet);
   }
 
   @Override
@@ -39,9 +76,9 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
     try {
       Registry registry = LocateRegistry.createRegistry(port);
       registry.rebind(SERVER_LIST_SERVICE, this);
-      System.out.println("CoordinatorServer started at host: "+header.getHost()+", port: "+header.getPort());
+      Log.logln("CoordinatorServer started at host: "+header.getHost()+", port: "+header.getPort());
     } catch (Exception e) {
-      System.out.println("Trouble: " + e);
+      Log.logln("Error while starting: " + e);
     }
   }
 

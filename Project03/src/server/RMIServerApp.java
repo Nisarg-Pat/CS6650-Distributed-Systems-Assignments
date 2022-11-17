@@ -28,7 +28,7 @@ public class RMIServerApp {
                 String coordinatorHost = args[2];
                 new RMIServer(host, port, coordinatorHost).start();
             } else {
-                System.out.println("Improper number of arguments");
+                System.out.println("Improper number of arguments!");
             }
         } catch (RemoteException e) {
             System.out.println("Server could not start! Reason: " + e.getMessage());
