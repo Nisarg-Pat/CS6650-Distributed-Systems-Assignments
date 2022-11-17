@@ -99,6 +99,6 @@ Sample images of client/server interaction is present in the res/Screenshots fol
 1) The operations on different servers for the two phase commit protocol is linear and on single thread rather than multi thread which decreases performance.
 
 ## Citations
-1. Two Phase commit protocol: Distributed Systems: Concepts and Design, 5th edition
+1. Two Phase Commit Protocol: Distributed Systems: Concepts and Design, 5th edition
 2. Java RMI: https://www.cs.uic.edu/~troy/fall04/cs441/rmi/calc/index.html
 3. How to synchronize: https://www.baeldung.com/java-synchronized
