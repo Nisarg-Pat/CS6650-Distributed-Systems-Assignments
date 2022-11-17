@@ -80,8 +80,11 @@ Client can perform one of the following commands on the terminal:
 3) DELETE \<key\> - Deletes the key-value pair from the database.
 
    Eg: Command: DELETE Hello
-4) QUIT - Closes the connection between client and server in TCP. Client Application ends (Both).
-5) There is one more special command: ALL - This gives all the key-value pairs present in the
+4) CONNECT - Connects the client to a different server given the server-name and the port number.
+
+   Eg: Command: CONNECT server5 1235
+5) QUIT - Closes the connection between client and server in TCP. Client Application ends (Both).
+6) There is one more special command: ALL - This gives all the key-value pairs present in the
    database. This is called once everytime a new instance of client application is created.
 
 ## Examples and Sample Images
@@ -92,9 +95,9 @@ Sample images of client/server interaction is present in the res/Screenshots fol
 
 
 ## Limitations
-1) The docker image for running server has port predefined as 1234. I was not able to make it dynamic. 
-   So run_server currently does not take any arguments but runs the rmiregistry on fixed port 1234.
+1) The operations on different servers for the two phase commit protocol is linear and on single thread rather than multi thread which decreases performance.
 
 ## Citations
-1. Java RMI: https://www.cs.uic.edu/~troy/fall04/cs441/rmi/calc/index.html
-2. How to synchronize: https://www.baeldung.com/java-synchronized
+1. Two Phase commit protocol: Distributed Systems: Concepts and Design, 5th edition
+2. Java RMI: https://www.cs.uic.edu/~troy/fall04/cs441/rmi/calc/index.html
+3. How to synchronize: https://www.baeldung.com/java-synchronized
