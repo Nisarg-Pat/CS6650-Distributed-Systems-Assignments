@@ -21,8 +21,11 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
   private final int port;
   private final ServerHeader header;
-  Set<ServerHeader> serverSet;
+
+
+  Set<Server> serverSet;
   private Server tempServer;
+  boolean foundServer;
 
   private static final int GET_TIMEOUT = 1000;
 
@@ -34,23 +37,23 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
   }
 
   @Override
-  public void addServer(ServerHeader server) throws RemoteException {
+  public void addServer(Server server) throws RemoteException {
     serverSet.add(server);
   }
 
   @Override
-  public List<ServerHeader> getAllServers() throws RemoteException {
+  public List<Server> getAllServers() throws RemoteException {
     //Temporary set of not accessible servers
     //To get accurate list of running servers
-    Set<ServerHeader> removedSet = new HashSet<>();
-    for(ServerHeader serverHeader: serverSet) {
-        tempServer = null;
+    Set<Server> removedSet = new HashSet<>();
+    for(Server server: serverSet) {
+        foundServer = false;
         Thread lookupTimeOut = new Thread(() -> {
           try {
-            Registry registry = LocateRegistry.getRegistry(serverHeader.getHost(), serverHeader.getPort());
-            tempServer = (Server) registry.lookup("KeyValueDBService");
-          } catch (NotBoundException | RemoteException e) {
-            tempServer = null;
+            server.getServerHeader();
+            foundServer = true;
+          } catch (RemoteException e) {
+            foundServer = false;
           }
         });
         long timeoutTime = System.currentTimeMillis() + GET_TIMEOUT;
@@ -62,14 +65,14 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             break;
           }
         }
-        if(tempServer == null) {
+        if(!foundServer) {
           //If unable to find the server, remove it
-          removedSet.add(serverHeader);
+          removedSet.add(server);
         }
     }
-    for(ServerHeader serverHeader: removedSet) {
+    for(Server server: removedSet) {
       //Removing the servers
-      serverSet.remove(serverHeader);
+      serverSet.remove(server);
     }
     //Printing the current server size.
     Log.logln("Current server size: "+serverSet.size());

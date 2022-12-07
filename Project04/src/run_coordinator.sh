@@ -12,4 +12,4 @@ fi
 
 docker run -it --rm --name $RMI_COORDINATOR_CONTAINER \
    --network $PROJECT_NETWORK $COORDINATOR_IMAGE \
-   java server.RMIServerApp "$RMI_COORDINATOR_CONTAINER"
+   java server.ServerApp "$RMI_COORDINATOR_CONTAINER"

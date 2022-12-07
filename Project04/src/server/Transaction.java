@@ -57,7 +57,7 @@ public class Transaction implements Serializable {
    * @param db the db on which to perform transaction
    * @return the results of the transaction commands
    */
-  public List<Object> execute(MyKeyValueDB db) {
+  public List<Object> execute(KeyValueStore db) {
     for(Command command: commandList) {
       result.add(command.execute(db));
     }

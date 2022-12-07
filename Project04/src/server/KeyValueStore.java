@@ -1,17 +1,13 @@
 package server;
 
 import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
-
-import util.KeyValueDB;
 
 /**
  * The database of the server.
  */
-public class MyKeyValueDB implements Serializable {
+public class KeyValueStore implements Serializable {
 
     private final Map<String, String> map;
 
@@ -23,7 +19,7 @@ public class MyKeyValueDB implements Serializable {
     /**
      * Constructor for the database
      */
-    public MyKeyValueDB() {
+    public KeyValueStore() {
         super();
         map = new HashMap<>();
     }
@@ -32,10 +28,10 @@ public class MyKeyValueDB implements Serializable {
      * Returns a copy of the database
      * @return A copy of the database
      */
-    public MyKeyValueDB copy() {
+    public KeyValueStore copy() {
 
         synchronized (LOCK) {
-            MyKeyValueDB copyDB = new MyKeyValueDB();
+            KeyValueStore copyDB = new KeyValueStore();
             for(Map.Entry<String, String> entry: map.entrySet()) {
                 copyDB.put(entry.getKey(), entry.getValue());
             }

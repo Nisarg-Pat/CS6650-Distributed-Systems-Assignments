@@ -1,6 +1,6 @@
 package server.command;
 
-import server.MyKeyValueDB;
+import server.KeyValueStore;
 
 /**
  * Delete command that removes the key.
@@ -13,7 +13,7 @@ public class DeleteCommand implements Command {
   }
 
   @Override
-  public Object execute(MyKeyValueDB db) {
+  public Object execute(KeyValueStore db) {
     return db.delete(key);
   }
 }

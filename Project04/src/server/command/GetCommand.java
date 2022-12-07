@@ -1,7 +1,6 @@
 package server.command;
 
-import server.MyKeyValueDB;
-import util.KeyValueDB;
+import server.KeyValueStore;
 
 /**
  * Get Command that returns the value of the key.
@@ -15,7 +14,7 @@ public class GetCommand implements Command {
   }
 
   @Override
-  public Object execute(MyKeyValueDB db) {
+  public Object execute(KeyValueStore db) {
     return db.get(key);
   }
 }

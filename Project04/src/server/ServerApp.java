@@ -8,7 +8,7 @@ import util.DataUtils;
 /**
  * RMI Server Application
  */
-public class PaxosServerApp {
+public class ServerApp {
 
     /**
      * Main Method to start RMI Server

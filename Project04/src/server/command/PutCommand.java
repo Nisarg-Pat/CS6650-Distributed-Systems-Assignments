@@ -1,6 +1,6 @@
 package server.command;
 
-import server.MyKeyValueDB;
+import server.KeyValueStore;
 
 /**
  * Put command that updates/create a key-value pair.
@@ -15,7 +15,7 @@ public class PutCommand implements Command{
   }
 
   @Override
-  public Object execute(MyKeyValueDB db) {
+  public Object execute(KeyValueStore db) {
     return db.put(key, value);
   }
 }

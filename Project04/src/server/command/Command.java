@@ -2,7 +2,7 @@ package server.command;
 
 import java.io.Serializable;
 
-import server.MyKeyValueDB;
+import server.KeyValueStore;
 
 /**
  * Command interface for executing an operation on the server.
@@ -14,5 +14,5 @@ public interface Command extends Serializable {
    * @param db The database(model) on which to perform execution
    * @return The return value specific to the command.
    */
-  Object execute(MyKeyValueDB db);
+  Object execute(KeyValueStore db);
 }

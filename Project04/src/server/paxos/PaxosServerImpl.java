@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import server.*;
+import server.command.Command;
 import server.command.DeleteCommand;
 import server.command.GetCommand;
 import server.command.PutCommand;
@@ -20,26 +21,31 @@ import util.Log;
  * Access: pakage-protected
  * Class for RMI Server
  */
-class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosServer {
+public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosServer {
 
     private static final int TRANSACTION_TIMEOUT = 10000; //10000 ms = 10 sec
     private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
-    protected MyKeyValueDB db;
+    protected KeyValueStore db;
     private final ServerHeader header;
 
-    //For All Servers
-    private Transaction currentTransaction;
-    private MyKeyValueDB copyDB;
-    private List<Object> result;
-    private Thread waitForTransactionResponse;
-    private final Set<String> committed;
+//    //For All Servers
+//    private Transaction currentTransaction;
+//    private KeyValueStore copyDB;
+//    private List<Object> result;
+//    private Thread waitForTransactionResponse;
+//    private final Set<String> committed;
+//
+//    //For Transaction Manager
+//    private int serverCount;
+//    private int canCommitResponseCount;
+//    private int haveCommittedCount;
+//    private boolean startCommit;
 
-    //For Transaction Manager
-    private int serverCount;
-    private int canCommitResponseCount;
-    private int haveCommittedCount;
-    private boolean startCommit;
+    //For Paxos
+    Proposer proposer;
+    Acceptor acceptor;
+    Learner learner;
 
     //For Coordinator Server
     private final String coordinatorHost;
@@ -59,14 +65,14 @@ class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosSe
         this.port = port;
         this.header = new ServerHeader(host, this.port);
         this.coordinatorHost = coordinatorHost;
-        this.db = new MyKeyValueDB();
+        this.db = new KeyValueStore();
         this.db.populate();
 
-        this.copyDB = null;
-        this.currentTransaction = null;
-        this.result = null;
-        this.committed = new HashSet<>();
-        waitForTransactionResponse = null;
+//        this.copyDB = null;
+//        this.currentTransaction = null;
+//        this.result = null;
+//        this.committed = new HashSet<>();
+//        waitForTransactionResponse = null;
     }
 
     @Override
@@ -80,19 +86,22 @@ class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosSe
             coordinatorServer = (CoordinatorServer) coordinatorRegistry.lookup(CoordinatorServer.SERVER_LIST_SERVICE);
 
             //Getting currentList of servers
-            List<ServerHeader> allServers = coordinatorServer.getAllServers();
+            List<Server> allServers = coordinatorServer.getAllServers();
 
             //Replicating db as one of the servers else initializing
-            if(allServers.size() == 0) {
+            if (allServers.size() == 0) {
                 db.populate();
             } else {
-                ServerHeader otherHeader = allServers.get(0);
-                Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
-                Server otherServer = (Server) otherServerRegistry.lookup("KeyValueDBService");
-                db = otherServer.getDBCopy();
+//                ServerHeader otherHeader = allServers.get(0);
+//                Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
+                PaxosServer otherServer = (PaxosServer) allServers.get(0);
+                db = otherServer.replicate();
             }
-            coordinatorServer.addServer(getServerHeader());
-            Log.logln("RMIServer started at host: "+header.getHost()+", port: "+header.getPort());
+            proposer = new ProposerImpl(this);
+            acceptor = new AcceptorImpl(this);
+            learner = new LearnerImpl(this);
+            coordinatorServer.addServer(this);
+            Log.logln("RMIServer started at host: " + header.getHost() + ", port: " + header.getPort());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,25 +116,30 @@ class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosSe
     //Put command as a distributed transaction
     @Override
     public boolean put(String key, String value) throws RemoteException {
-        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
-        transaction.addCommand(new PutCommand(key, value));
-        List<Object> result = performTransaction(transaction);
-        if(result == null || result.size() == 0) {
-            return false;
-        }
-        return (boolean) result.get(0);
+        Command command = new PutCommand(key, value);
+        Proposal proposal = new Proposal(0, command);
+        return (boolean) proposer.propose(command);
+
+//        Transaction transaction = new Transaction("" + this.port + "" + System.currentTimeMillis(), this.header);
+//        transaction.addCommand();
+//        List<Object> result = performTransaction(transaction);
+//        if (result == null || result.size() == 0) {
+//            return false;
+//        }
+//        return (boolean) result.get(0);
     }
 
     //Delete command as a distributed transaction
     @Override
     public boolean delete(String key) throws RemoteException {
-        Transaction transaction = new Transaction(""+this.port+""+System.currentTimeMillis(), this.header);
-        transaction.addCommand(new DeleteCommand(key));
-        List<Object> result = performTransaction(transaction);
-        if(result == null || result.size() == 0) {
-            return false;
-        }
-        return (boolean) result.get(0);
+        return false;
+//        Transaction transaction = new Transaction("" + this.port + "" + System.currentTimeMillis(), this.header);
+//        transaction.addCommand(new DeleteCommand(key));
+//        List<Object> result = performTransaction(transaction);
+//        if (result == null || result.size() == 0) {
+//            return false;
+//        }
+//        return (boolean) result.get(0);
     }
 
     @Override
@@ -139,8 +153,13 @@ class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosSe
     }
 
     @Override
-    public MyKeyValueDB getDBCopy() throws RemoteException {
+    public KeyValueStore replicate() {
         return db.copy();
+    }
+
+    @Override
+    public CoordinatorServer getCoordinator() {
+        return coordinatorServer;
     }
 
     @Override
@@ -151,22 +170,22 @@ class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosSe
 
     private Server getServerFromHeader(ServerHeader header) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry(header.getHost(), header.getPort());
-        Server server = (Server)registry.lookup("KeyValueDBService");
+        Server server = (Server) registry.lookup("KeyValueDBService");
         return server;
     }
 
     @Override
     public Proposer getProposer() {
-        return null;
+        return proposer;
     }
 
     @Override
     public Acceptor getAcceptor() {
-        return null;
+        return acceptor;
     }
 
     @Override
     public Learner getLearner() {
-        return null;
+        return learner;
     }
 }

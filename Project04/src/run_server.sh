@@ -12,4 +12,4 @@ fi
 
 docker run -it --rm --name "$1" \
    --network $PROJECT_NETWORK $SERVER_IMAGE \
-   java server.RMIServerApp "$1" "$2" $COORDINATOR_NAME
+   java server.ServerApp "$1" "$2" $COORDINATOR_NAME
