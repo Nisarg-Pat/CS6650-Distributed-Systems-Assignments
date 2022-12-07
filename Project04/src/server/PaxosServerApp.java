@@ -2,12 +2,13 @@ package server;
 
 import java.rmi.RemoteException;
 
+import server.paxos.PaxosServerImpl;
 import util.DataUtils;
 
 /**
  * RMI Server Application
  */
-public class RMIServerApp {
+public class PaxosServerApp {
 
     /**
      * Main Method to start RMI Server
@@ -28,7 +29,7 @@ public class RMIServerApp {
                 String host = args[0];
                 int port = Integer.parseInt(args[1]);
                 String coordinatorHost = args[2];
-                new RMIServer(host, port, coordinatorHost).start();
+                new PaxosServerImpl(host, port, coordinatorHost).start();
             } else {
                 System.out.println("Improper number of arguments!");
             }

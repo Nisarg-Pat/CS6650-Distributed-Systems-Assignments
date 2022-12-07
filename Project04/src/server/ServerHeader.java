@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A header for Server that includes the details of it.
  */
-class ServerHeader implements Serializable {
+public class ServerHeader implements Serializable {
   private final String host;
   private final int port;
 

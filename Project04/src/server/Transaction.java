@@ -10,7 +10,7 @@ import server.command.Command;
  * A transaction contains a list of commands that should be performed in all or none manner.
  * This is an instance of such a transaction.
  */
-class Transaction implements Serializable {
+public class Transaction implements Serializable {
   private final ServerHeader callerHeader;
   private final String id;
   private final List<Command> commandList;
