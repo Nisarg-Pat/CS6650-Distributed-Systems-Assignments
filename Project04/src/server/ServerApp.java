@@ -2,7 +2,6 @@ package server;
 
 import java.rmi.RemoteException;
 
-import server.paxos.PaxosServerImpl;
 import util.DataUtils;
 
 /**

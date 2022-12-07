@@ -34,4 +34,9 @@ public class ServerHeader implements Serializable {
   public int getPort() {
     return port;
   }
+
+    @Override
+    public String toString() {
+        return host+":"+port;
+    }
 }

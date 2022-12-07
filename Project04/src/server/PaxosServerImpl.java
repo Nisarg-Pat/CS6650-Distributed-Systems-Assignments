@@ -1,19 +1,16 @@
-package server.paxos;
+package server;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import server.*;
 import server.command.Command;
-import server.command.DeleteCommand;
 import server.command.GetCommand;
 import server.command.PutCommand;
+import server.paxos.*;
 import util.KeyValueDB;
 import util.Log;
 
@@ -26,8 +23,13 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     private static final int TRANSACTION_TIMEOUT = 10000; //10000 ms = 10 sec
     private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
-    protected KeyValueStore db;
+    protected KeyValueStore store;
     private final ServerHeader header;
+
+
+    //For Paxos
+    private int minProposal;
+    private Proposal acceptedProposal;
 
 //    //For All Servers
 //    private Transaction currentTransaction;
@@ -43,9 +45,9 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
 //    private boolean startCommit;
 
     //For Paxos
-    Proposer proposer;
-    Acceptor acceptor;
-    Learner learner;
+//    Proposer proposer;
+//    Acceptor acceptor;
+//    Learner learner;
 
     //For Coordinator Server
     private final String coordinatorHost;
@@ -65,14 +67,11 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
         this.port = port;
         this.header = new ServerHeader(host, this.port);
         this.coordinatorHost = coordinatorHost;
-        this.db = new KeyValueStore();
-        this.db.populate();
+        this.store = new KeyValueStore();
+        this.store.populate();
 
-//        this.copyDB = null;
-//        this.currentTransaction = null;
-//        this.result = null;
-//        this.committed = new HashSet<>();
-//        waitForTransactionResponse = null;
+        this.minProposal = 0;
+        this.acceptedProposal = null;
     }
 
     @Override
@@ -90,16 +89,13 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
 
             //Replicating db as one of the servers else initializing
             if (allServers.size() == 0) {
-                db.populate();
+                store.populate();
             } else {
 //                ServerHeader otherHeader = allServers.get(0);
 //                Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
                 PaxosServer otherServer = (PaxosServer) allServers.get(0);
-                db = otherServer.replicate();
+                store = otherServer.replicate();
             }
-            proposer = new ProposerImpl(this);
-            acceptor = new AcceptorImpl(this);
-            learner = new LearnerImpl(this, db);
             coordinatorServer.addServer(this);
             Log.logln("RMIServer started at host: " + header.getHost() + ", port: " + header.getPort());
         } catch (Exception e) {
@@ -110,51 +106,35 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     //Get command not requiring distributed transaction
     @Override
     public String get(String key) throws RemoteException {
-        return (String) new GetCommand(key).execute(db);
+        return (String) new GetCommand(key).execute(store);
     }
 
     //Put command as a distributed transaction
     @Override
     public boolean put(String key, String value) throws RemoteException {
         Command command = new PutCommand(key, value);
-        Proposal proposal = new Proposal(0, command);
-        return (boolean) proposer.propose(command);
-
-//        Transaction transaction = new Transaction("" + this.port + "" + System.currentTimeMillis(), this.header);
-//        transaction.addCommand();
-//        List<Object> result = performTransaction(transaction);
-//        if (result == null || result.size() == 0) {
-//            return false;
-//        }
-//        return (boolean) result.get(0);
+        return (boolean) coordinatorServer.propose(command);
     }
 
     //Delete command as a distributed transaction
     @Override
     public boolean delete(String key) throws RemoteException {
         return false;
-//        Transaction transaction = new Transaction("" + this.port + "" + System.currentTimeMillis(), this.header);
-//        transaction.addCommand(new DeleteCommand(key));
-//        List<Object> result = performTransaction(transaction);
-//        if (result == null || result.size() == 0) {
-//            return false;
-//        }
-//        return (boolean) result.get(0);
     }
 
     @Override
     public void populate() throws RemoteException {
-        db.populate();
+        store.populate();
     }
 
     @Override
     public String getString() throws RemoteException {
-        return db.getString();
+        return store.getString();
     }
 
     @Override
     public KeyValueStore replicate() {
-        return db.copy();
+        return store.copy();
     }
 
     @Override
@@ -168,36 +148,36 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     }
 
 
-    private Server getServerFromHeader(ServerHeader header) throws RemoteException, NotBoundException {
-        Registry registry = LocateRegistry.getRegistry(header.getHost(), header.getPort());
-        Server server = (Server) registry.lookup("KeyValueDBService");
-        return server;
+
+    @Override
+    public Promise prepare(Proposal proposal) throws RemoteException {
+        if(proposal.getProposalNumber() > minProposal) {
+            minProposal = proposal.getProposalNumber();
+            Log.logln("Got Preparation request for "+proposal+": Promised");
+            return new Promise(true, acceptedProposal);
+        } else {
+            Log.logln("Got Preparation request for "+proposal+": Denied");
+            return new Promise(false, null);
+        }
     }
 
     @Override
-    public Proposer getProposer() {
-        return proposer;
-    }
-
-    @Override
-    public Acceptor getAcceptor() {
-        return acceptor;
-    }
-
-    @Override
-    public Learner getLearner() {
-        return learner;
-    }
-
-    @Override
-    public void log(String s) {
-        System.out.println(s);
+    public int accept(Proposal proposal) throws RemoteException {
+        if(proposal.getProposalNumber() >= minProposal) {
+            minProposal = proposal.getProposalNumber();
+            acceptedProposal = new Proposal(proposal);
+            Log.logln("Got Accept request for "+proposal+": Accepted");
+//            acceptedProposal.getCommand().execute(store);
+        } else {
+            Log.logln("Got Accept request for "+proposal+": Rejected");
+        }
+        return minProposal;
     }
 
     @Override
     public boolean learn(Proposal proposal) throws RemoteException {
         Command command = proposal.getCommand();
-        log("Got Learn request for "+proposal+": Learned");
-        return (boolean)command.execute(db);
+        Log.logln("Got Learn request for "+proposal+": Learned");
+        return (boolean)command.execute(store);
     }
 }

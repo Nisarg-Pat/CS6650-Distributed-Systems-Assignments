@@ -1,6 +1,6 @@
 package server;
 
-import server.paxos.PaxosServer;
+import server.paxos.Proposer;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * A coordinator server that has the details of all the servers running in the application.
  */
-public interface CoordinatorServer extends Server {
+public interface CoordinatorServer extends Server, Proposer {
 
   //Coordinator server runs in specific port: 9999
   int PORT = 9999;
