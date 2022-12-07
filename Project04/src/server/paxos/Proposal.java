@@ -28,6 +28,6 @@ public class Proposal implements Serializable {
 
     @Override
     public String toString() {
-        return "Proposal: ( "+proposalNumber+", "+command+")";
+        return "Proposal: ("+proposalNumber+", "+command+")";
     }
 }

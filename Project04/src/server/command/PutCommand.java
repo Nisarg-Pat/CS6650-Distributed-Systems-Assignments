@@ -16,7 +16,6 @@ public class PutCommand implements Command{
 
   @Override
   public Object execute(KeyValueStore db) {
-      System.out.println("executing");
     return db.put(key, value);
   }
 

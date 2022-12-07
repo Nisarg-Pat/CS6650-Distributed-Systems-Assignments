@@ -203,6 +203,7 @@ public class RMIClient implements Client {
                     returnValue = String.format("Cannot put (%s, %s) in database. Please check the key and value.", key, value);
                 }
             } catch (RemoteException e) {
+                e.printStackTrace();
                 returnValue = "Host Disconnected! Try Again!!";
                 connected = false;
             }

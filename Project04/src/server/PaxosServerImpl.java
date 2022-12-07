@@ -8,6 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import server.command.Command;
+import server.command.DeleteCommand;
 import server.command.GetCommand;
 import server.command.PutCommand;
 import server.paxos.*;
@@ -70,8 +71,7 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
         this.store = new KeyValueStore();
         this.store.populate();
 
-        this.minProposal = 0;
-        this.acceptedProposal = null;
+        resetPaxos();
     }
 
     @Override
@@ -119,7 +119,8 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     //Delete command as a distributed transaction
     @Override
     public boolean delete(String key) throws RemoteException {
-        return false;
+        Command command = new DeleteCommand(key);
+        return (boolean) coordinatorServer.propose(command);
     }
 
     @Override
@@ -175,9 +176,15 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     }
 
     @Override
-    public boolean learn(Proposal proposal) throws RemoteException {
+    public Object learn(Proposal proposal) throws RemoteException {
         Command command = proposal.getCommand();
         Log.logln("Got Learn request for "+proposal+": Learned");
-        return (boolean)command.execute(store);
+        resetPaxos();
+        return (Object)command.execute(store);
+    }
+
+    private void resetPaxos() {
+        minProposal = 0;
+        acceptedProposal = null;
     }
 }

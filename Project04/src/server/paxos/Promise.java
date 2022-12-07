@@ -1,6 +1,8 @@
 package server.paxos;
 
-public class Promise {
+import java.io.Serializable;
+
+public class Promise implements Serializable {
     private final boolean promise;
     private final Proposal acceptedProposal;
 

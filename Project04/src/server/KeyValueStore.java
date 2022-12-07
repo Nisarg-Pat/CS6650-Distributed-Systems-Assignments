@@ -58,7 +58,6 @@ public class KeyValueStore implements Serializable {
      */
     public boolean put(String key, String value) {
 
-
         synchronized (LOCK) {
             if (key.isBlank() || value.isBlank()) {
                 return false;

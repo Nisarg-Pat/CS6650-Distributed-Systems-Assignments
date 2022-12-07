@@ -26,7 +26,6 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
 
     Set<Server> serverSet;
-    private Server tempServer;
     boolean foundServer;
 
     private static final int GET_TIMEOUT = 1000;
@@ -41,7 +40,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
     @Override
     public void addServer(Server server) throws RemoteException {
         serverSet.add(server);
-        Log.logln("Adding Server "+server.getServerHeader()+", Server Set Size: "+serverSet.size());
+        Log.logln("Adding Server " + server.getServerHeader() + ", Server Set Size: " + serverSet.size());
     }
 
     @Override
@@ -102,7 +101,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
     public static int proposalID = 0;
 
     @Override
-    public Object propose(Command command) throws RemoteException{
+    public Object propose(Command command) throws RemoteException {
         proposalID++;
         Proposal proposal = new Proposal(proposalID, command);
 
@@ -139,23 +138,15 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             }
 
             int committed = 0;
+            boolean response = true;
             for (Server server : servers) {
-                boolean response = ((Learner) server).learn(currentProposal);
-                if (response) {
-                    committed++;
-                }
+                response = (boolean) ((Learner) server).learn(currentProposal);
             }
 
-            if (committed == servers.size()) {
-                return true;
-            }
-
+            return response;
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-
         return false;
-
     }
 }
