@@ -17,4 +17,9 @@ public class GetCommand implements Command {
   public Object execute(KeyValueStore db) {
     return db.get(key);
   }
+
+    @Override
+    public String toString() {
+        return "GET "+key;
+    }
 }

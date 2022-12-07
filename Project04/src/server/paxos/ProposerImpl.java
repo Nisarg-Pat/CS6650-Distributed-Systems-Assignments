@@ -4,9 +4,11 @@ import server.CoordinatorServer;
 import server.Server;
 import server.command.Command;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.List;
 
-public class ProposerImpl implements Proposer {
+public class ProposerImpl implements Proposer, Serializable {
 
     public static int proposalID = 0;
 
@@ -21,13 +23,52 @@ public class ProposerImpl implements Proposer {
         proposalID++;
         Proposal proposal = new Proposal(proposalID, command);
 
+        int promisedServers = 0;
+
+        int maxProposalNumber = 0;
+        Proposal currentProposal  = proposal;
+
+        //Proposal Phase
         try {
-            CoordinatorServer coordinator = paxosServer.getCoordinator();
-            for(Server server: coordinator.getAllServers()) {
-
+            paxosServer.log("Proposing "+proposal);
+            List<Server> servers = paxosServer.getCoordinator().getAllServers();
+            for(Server server: servers) {
+                Promise promise = ((PaxosServer)server).getAcceptor().prepare(proposal);
+                if(promise.isPromise()) {
+                    promisedServers++;
+                    Proposal acceptedProposal = promise.getAcceptedProposal();
+                    if(acceptedProposal!=null && acceptedProposal.getProposalNumber() > maxProposalNumber) {
+                        maxProposalNumber = acceptedProposal.getProposalNumber();
+                        currentProposal = new Proposal(proposalID, acceptedProposal.getCommand());
+                    }
+                }
             }
-        } catch (RemoteException e) {
 
+            if(promisedServers <= servers.size()/2) {
+                return false;
+            }
+
+//            int acceptedServers = 0;
+
+            for(Server server: servers) {
+                ((PaxosServer)server).getAcceptor().accept(currentProposal);
+//                acceptedServers ++;
+            }
+
+            int committed = 0;
+            for(Server server: servers) {
+                boolean response = ((PaxosServer)server).getLearner().learn(currentProposal);
+                if(response) {
+                    committed++;
+                }
+            }
+
+            if(committed == servers.size()) {
+                return true;
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
 
 

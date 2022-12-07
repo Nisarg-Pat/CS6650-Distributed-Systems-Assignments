@@ -15,4 +15,8 @@ public interface PaxosServer extends Server {
     KeyValueStore replicate() throws RemoteException;
 
     CoordinatorServer getCoordinator() throws RemoteException;
+
+    void log(String s) throws RemoteException;
+
+    boolean learn(Proposal proposal) throws RemoteException;
 }

@@ -99,11 +99,11 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
             }
             proposer = new ProposerImpl(this);
             acceptor = new AcceptorImpl(this);
-            learner = new LearnerImpl(this);
+            learner = new LearnerImpl(this, db);
             coordinatorServer.addServer(this);
             Log.logln("RMIServer started at host: " + header.getHost() + ", port: " + header.getPort());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.logln(e.getMessage());
         }
     }
 
@@ -187,5 +187,17 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
     @Override
     public Learner getLearner() {
         return learner;
+    }
+
+    @Override
+    public void log(String s) {
+        System.out.println(s);
+    }
+
+    @Override
+    public boolean learn(Proposal proposal) throws RemoteException {
+        Command command = proposal.getCommand();
+        log("Got Learn request for "+proposal+": Learned");
+        return (boolean)command.execute(db);
     }
 }

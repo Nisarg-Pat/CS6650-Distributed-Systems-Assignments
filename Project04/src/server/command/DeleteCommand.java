@@ -16,4 +16,10 @@ public class DeleteCommand implements Command {
   public Object execute(KeyValueStore db) {
     return db.delete(key);
   }
+
+
+    @Override
+    public String toString() {
+        return "DELETE "+key;
+    }
 }
