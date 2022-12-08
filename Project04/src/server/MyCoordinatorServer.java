@@ -17,7 +17,7 @@ import util.Log;
 
 /**
  * Implementation of Coordinator Server. It's function is to store the details of all the servers in the application.
- * Should run before any other server starts
+ * Should run before any other server starts. This coordinator also takes role of Proposer in Paxos algorithm.
  */
 public class MyCoordinatorServer extends UnicastRemoteObject implements CoordinatorServer {
 
@@ -101,11 +101,13 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
     @Override
     public Object propose(Command command) throws RemoteException {
-        try {
-            Thread.sleep(5000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+//        Thread for concurrency checking
+//        try {
+//            Thread.sleep(5000);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         proposalID++;
         Proposal proposal = new Proposal(proposalID, command);

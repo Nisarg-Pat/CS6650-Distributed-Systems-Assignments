@@ -2,6 +2,9 @@ package server.paxos;
 
 import java.io.Serializable;
 
+/**
+ * A representation of a Promise sent by Acceptor to Proposer during Paxos.
+ */
 public class Promise implements Serializable {
     private final boolean promise;
     private final Proposal acceptedProposal;

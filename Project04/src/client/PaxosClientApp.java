@@ -6,11 +6,11 @@ import java.rmi.RemoteException;
 import util.DataUtils;
 
 /**
- * RMI Client Application
+ * PAXOS Client Application
  */
-public class RMIClientApp {
+public class PaxosClientApp {
     /**
-     * Main Method to start RMI Client
+     * Main Method to start PAXOS Client
      *
      * @param args Required args: <hostname> <port>
      */
@@ -24,7 +24,7 @@ public class RMIClientApp {
             int port = Integer.parseInt(args[1]);
 
             //Creating a TCP Client and calling execute
-            Client client = new RMIClient(host, port);
+            Client client = new PaxosClient(host, port);
             client.execute();
         } catch (NotBoundException | RemoteException e) {
             System.out.println("Error starting client: "+e.getMessage());

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-PROJECT_NETWORK='project3-network'
-SERVER_IMAGE='project3-server-image'
-COORDINATOR_NAME='my-rmi-coordinator'
+PROJECT_NETWORK='project4-network'
+SERVER_IMAGE='project4-server-image'
+COORDINATOR_NAME='my-paxos-coordinator'
 
 if [ $# -ne 2 ]
 then

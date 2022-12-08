@@ -10,9 +10,9 @@ import util.KeyValueDB;
 import util.Log;
 
 /**
- * RMI implementation of Client.
+ * Paxos implementation of Client.
  */
-public class RMIClient implements Client {
+public class PaxosClient implements Client {
 
     protected final Scanner scanner;
 
@@ -26,14 +26,14 @@ public class RMIClient implements Client {
     private static KeyValueDB db;
 
     /**
-     * Constructor for RMIClient
+     * Constructor for PaxosClient
      *
      * @param host hostname of the rmiregistry
      * @param port port of the rmiregistry
      * @throws RemoteException
      * @throws NotBoundException
      */
-    public RMIClient(String host, int port) throws RemoteException, NotBoundException {
+    public PaxosClient(String host, int port) throws RemoteException, NotBoundException {
         this.host = host;
         this.port = port;
 

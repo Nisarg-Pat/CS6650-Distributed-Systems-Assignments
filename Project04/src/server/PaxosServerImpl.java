@@ -126,6 +126,9 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
         return header;
     }
 
+
+    //Implementation of Paxos Acceptor
+
     @Override
     public Promise prepare(Proposal proposal) throws RemoteException {
 
@@ -188,6 +191,9 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
         }
         return null;
     }
+
+
+    // Implementation of paxos learning
 
     @Override
     public Object learn(Proposal proposal) throws RemoteException {

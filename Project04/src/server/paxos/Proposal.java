@@ -4,6 +4,9 @@ import server.command.Command;
 
 import java.io.Serializable;
 
+/**
+ * A representation of a Proposal that is sent by Proposer in Paxos Algorithm
+ */
 public class Proposal implements Serializable {
     private final int proposalNumber;
     private final Command command;
@@ -28,6 +31,6 @@ public class Proposal implements Serializable {
 
     @Override
     public String toString() {
-        return "Proposal: ("+proposalNumber+", "+command+")";
+        return "Proposal: (" + proposalNumber + ", " + command + ")";
     }
 }

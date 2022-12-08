@@ -1,18 +1,18 @@
 #!/bin/bash
 
-PROJECT_NETWORK='project3-network'
-SERVER_IMAGE='project3-server-image'
-RMI_SERVER_CONTAINER='my-rmi-server'
-COORDINATOR_IMAGE='project3-coordinator-image'
-RMI_COORDINATOR_CONTAINER='my-rmi-coordinator'
-CLIENT_IMAGE='project3-client-image'
-RMI_CLIENT_CONTAINER='my-rmi-client'
+PROJECT_NETWORK='project4-network'
+SERVER_IMAGE='project4-server-image'
+PAXOS_SERVER_CONTAINER='my-paxos-server'
+COORDINATOR_IMAGE='project4-coordinator-image'
+PAXOS_COORDINATOR_CONTAINER='my-paxos-coordinator'
+CLIENT_IMAGE='project4-client-image'
+PAXOS_CLIENT_CONTAINER='my-paxos-client'
 
 # clean up existing resources, if any
 echo "----------Cleaning up existing resources----------"
-docker container stop $RMI_SERVER_CONTAINER 2> /dev/null && docker container rm $RMI_SERVER_CONTAINER 2> /dev/null
-docker container stop $RMI_CLIENT_CONTAINER 2> /dev/null && docker container rm $RMI_CLIENT_CONTAINER 2> /dev/null
-docker container stop $RMI_COORDINATOR_CONTAINER 2> /dev/null && docker container rm $RMI_COORDINATOR_CONTAINER 2> /dev/null
+docker container stop $PAXOS_SERVER_CONTAINER 2> /dev/null && docker container rm $PAXOS_SERVER_CONTAINER 2> /dev/null
+docker container stop $PAXOS_CLIENT_CONTAINER 2> /dev/null && docker container rm $PAXOS_CLIENT_CONTAINER 2> /dev/null
+docker container stop $PAXOS_COORDINATOR_CONTAINER 2> /dev/null && docker container rm $PAXOS_COORDINATOR_CONTAINER 2> /dev/null
 docker network rm $PROJECT_NETWORK 2> /dev/null
 
 # only cleanup
