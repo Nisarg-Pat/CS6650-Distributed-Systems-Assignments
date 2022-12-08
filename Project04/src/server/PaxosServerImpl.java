@@ -1,11 +1,11 @@
 package server;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.concurrent.*;
 
 import server.command.Command;
 import server.command.DeleteCommand;
@@ -21,7 +21,7 @@ import util.Log;
  */
 public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosServer {
 
-    private static final int TRANSACTION_TIMEOUT = 10000; //10000 ms = 10 sec
+    private static final int EXECUTOR_TIMEOUT = 10000; //10000 ms = 10 sec
     private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
     protected KeyValueStore store;
@@ -29,26 +29,9 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
 
 
     //For Paxos
+    private static final double FAILURE_CHANCE = 0.1;
     private int minProposal;
     private Proposal acceptedProposal;
-
-//    //For All Servers
-//    private Transaction currentTransaction;
-//    private KeyValueStore copyDB;
-//    private List<Object> result;
-//    private Thread waitForTransactionResponse;
-//    private final Set<String> committed;
-//
-//    //For Transaction Manager
-//    private int serverCount;
-//    private int canCommitResponseCount;
-//    private int haveCommittedCount;
-//    private boolean startCommit;
-
-    //For Paxos
-//    Proposer proposer;
-//    Acceptor acceptor;
-//    Learner learner;
 
     //For Coordinator Server
     private final String coordinatorHost;
@@ -91,8 +74,6 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
             if (allServers.size() == 0) {
                 store.populate();
             } else {
-//                ServerHeader otherHeader = allServers.get(0);
-//                Registry otherServerRegistry = LocateRegistry.getRegistry(otherHeader.getHost(), otherHeader.getPort());
                 PaxosServer otherServer = (PaxosServer) allServers.get(0);
                 store = otherServer.replicate();
             }
@@ -148,39 +129,75 @@ public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, 
         return header;
     }
 
-
-
     @Override
     public Promise prepare(Proposal proposal) throws RemoteException {
-        if(proposal.getProposalNumber() > minProposal) {
-            minProposal = proposal.getProposalNumber();
-            Log.logln("Got Preparation request for "+proposal+": Promised");
-            return new Promise(true, acceptedProposal);
-        } else {
-            Log.logln("Got Preparation request for "+proposal+": Denied");
-            return new Promise(false, null);
+
+        //Implementing random failure of the server with a probability of 0.1
+        if (Math.random() <= FAILURE_CHANCE) {
+            Log.logln("Got Preparation request for " + proposal + ": Failing Server");
+            return null;
         }
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        FutureTask<Promise> futureTask = new FutureTask<>(new Callable<Promise>() {
+            @Override
+            public Promise call() throws Exception {
+                if (proposal.getProposalNumber() > minProposal) {
+                    minProposal = proposal.getProposalNumber();
+                    Log.logln("Got Preparation request for " + proposal + ": Promised");
+                    return new Promise(true, acceptedProposal);
+                } else {
+                    Log.logln("Got Preparation request for " + proposal + ": Denied");
+                    return new Promise(false, null);
+                }
+            }
+        });
+
+        try {
+            executorService.submit(futureTask);
+            return futureTask.get(EXECUTOR_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            Log.logln("Timeout to prepare " + proposal + ": Failed Timeout");
+        }
+        return null;
     }
 
     @Override
-    public int accept(Proposal proposal) throws RemoteException {
-        if(proposal.getProposalNumber() >= minProposal) {
-            minProposal = proposal.getProposalNumber();
-            acceptedProposal = new Proposal(proposal);
-            Log.logln("Got Accept request for "+proposal+": Accepted");
-//            acceptedProposal.getCommand().execute(store);
-        } else {
-            Log.logln("Got Accept request for "+proposal+": Rejected");
+    public Integer accept(Proposal proposal) throws RemoteException {
+
+        //Implementing random failure of the server with a probability of 0.1
+        if (Math.random() <= FAILURE_CHANCE) {
+            Log.logln("Got Preparation request for " + proposal + ": Failing Server");
+            return null;
         }
-        return minProposal;
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        FutureTask<Integer> futureTask = new FutureTask<>((Callable<Integer>) () -> {
+            if (proposal.getProposalNumber() >= minProposal) {
+                minProposal = proposal.getProposalNumber();
+                acceptedProposal = new Proposal(proposal);
+                Log.logln("Got Accept request for " + proposal + ": Accepted");
+            } else {
+                Log.logln("Got Accept request for " + proposal + ": Rejected");
+            }
+            return minProposal;
+        });
+
+        try {
+            executorService.submit(futureTask);
+            return futureTask.get(EXECUTOR_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+            Log.logln("Timeout to accept " + proposal + ": Failed Timeout");
+        }
+        return null;
     }
 
     @Override
     public Object learn(Proposal proposal) throws RemoteException {
         Command command = proposal.getCommand();
-        Log.logln("Got Learn request for "+proposal+": Learned");
+        Log.logln("Got Learn request for " + proposal + ": Learned");
         resetPaxos();
-        return (Object)command.execute(store);
+        return command.execute(store);
     }
 
     private void resetPaxos() {

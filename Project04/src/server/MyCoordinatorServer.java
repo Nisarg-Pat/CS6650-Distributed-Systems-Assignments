@@ -76,8 +76,6 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             //Removing the servers
             serverSet.remove(server);
         }
-        //Printing the current server size.
-//        Log.logln("Current server size: " + serverSet.size());
         return new ArrayList<>(serverSet);
     }
 
@@ -97,6 +95,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
         return header;
     }
 
+    //Proposer Implementation:
 
     public static int proposalID = 0;
 
@@ -130,14 +129,15 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
                 return false;
             }
 
-//            int acceptedServers = 0;
+            int numAccepted = 0;
 
             for (Server server : servers) {
-                ((Acceptor) server).accept(currentProposal);
-//                acceptedServers ++;
+                int value = ((Acceptor) server).accept(currentProposal);
+                if(value == proposalID) {
+                    numAccepted++;
+                }
             }
 
-            int committed = 0;
             boolean response = true;
             for (Server server : servers) {
                 response = (boolean) ((Learner) server).learn(currentProposal);
