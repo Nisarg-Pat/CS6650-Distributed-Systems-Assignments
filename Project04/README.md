@@ -1,11 +1,13 @@
-# P-3 Distributed Key-Value Store
+# P-4 Distributed Key-Value Store with Paxos
 
 ## Overview
 
 This project implements a basic multi-threaded server which serves as a key-value store and
 responds to the requests made by clients using Remote Method Invocation in Java. The remote object is binded to 
 rmiregistry created before starting the server.
-Multiple servers can be replicated and client can acces any of them to perform consistent operations on the system.
+Multiple servers can be replicated and client can access any of them to perform consistent operations on the system.
+
+The system is fault-tolerant to fail-stop failures caused by random crashes on the server. Paxos algorithm is implemented to achieve consensus when atleast half of the servers are running as expected. Random server crashes are also simulated to understand the true working of Paxos Algorithm.
 
 ## List of Features of the Client
 These are the features of the client applications:
@@ -30,10 +32,10 @@ These are the features of server application:
   as a command line argument. Rmiregistry and server run on the same machine.
 * Server binds the KeyStoreDB object to the rmiregistry.
 * The KeyStoreDB can perform 3 actions: Get/Put/Delete.
-* KeyStoreDB can handle multiple clients at the same time, with mutual exclusion 
-  among the actions making them thread safe.
 * KeyStoreDB is initialized with 10 key-value pairs and the initial contents of the DB are displayed 
   to the clients who just logged in.
+* Server can crash and restart with a small probability at any operation.
+* Consensus can be reached with atleast half of the server running properly
 
 ## How to Run
 Follow these steps to run the applications using docker:
@@ -43,7 +45,7 @@ Follow these steps to run the applications using docker:
    > $ ./deploy.sh
 3) Run the Coordinator server application using run_coordinator.sh bash file. NOTE: The coordinator has to run before starting any other server.
    > $ ./run_coordinator.sh
-4) Run the RMI server application using run_server.sh bash file by providing the server-name and port. Start multiple such servers on different terminals. 5 such servers can be
+4) Run the Paxos server application using run_server.sh bash file by providing the server-name and port. Start multiple such servers on different terminals. 5 such servers can be
    > $ ./run_server.sh server1 1231
 
    > $ ./run_server.sh server2 1232
@@ -53,7 +55,7 @@ Follow these steps to run the applications using docker:
    > $ ./run_server.sh server4 1234
 
    > $ ./run_server.sh server5 1235
-5) Run the RMI client application using run_client.sh bash file with any running server-name,
+5) Run the Paxos client application using run_client.sh bash file with any running server-name,
    and port number as arguments in a different terminal.
    > $ ./run_client.sh server1 1231
 5) The server and client are ready to communicate. You can create multiple clients and interact with server.
@@ -91,14 +93,15 @@ Client can perform one of the following commands on the terminal:
 
 Sample images of client/server interaction is present in the res/Screenshots folder.
 1) Coordinator.png: How to run the Coordinator
-2) RMIServer.png: How to run the RMIServerApp
-3) RMIClient.png: Sample images showing to run RMIClient and how data is shown in RMIClientApp.
+2) PaxosServer.png: How to run the ServerApp and logs shown at the server
+3) PaxosClient.png: Sample images showing to run PaxosClient and how data is shown in PaxosClientApp.
 
 
 ## Limitations
 1) The operations on different servers for the two phase commit protocol is linear and on single thread rather than multi thread which decreases performance.
+2) It is not a full-fledged implementation of Paxos algorithm, but just a simple version of it.
 
 ## Citations
-1. Two Phase Commit Protocol: Distributed Systems: Concepts and Design, 5th edition
+1. Paxos Made Simple, Leslie Lamport: https://www.microsoft.com/en-us/research/publication/paxos-made-simple/
 2. Java RMI: https://www.cs.uic.edu/~troy/fall04/cs441/rmi/calc/index.html
 3. How to synchronize: https://www.baeldung.com/java-synchronized
