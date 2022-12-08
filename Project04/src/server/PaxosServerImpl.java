@@ -21,24 +21,21 @@ import util.Log;
  */
 public class PaxosServerImpl extends UnicastRemoteObject implements KeyValueDB, PaxosServer {
 
-    private static final int EXECUTOR_TIMEOUT = 10000; //10000 ms = 10 sec
-    private static final int TRANSACTION_RESPONSE_WAIT_TIME = 2000;
     protected final int port;
     protected KeyValueStore store;
     private final ServerHeader header;
 
 
     //For Paxos
-    private static final double FAILURE_CHANCE = 0.1;
     private int minProposal;
     private Proposal acceptedProposal;
+
+    private static final double FAILURE_CHANCE = 0.2;
+    private static final int EXECUTOR_TIMEOUT = 10000; //10000 ms = 10 sec
 
     //For Coordinator Server
     private final String coordinatorHost;
     protected CoordinatorServer coordinatorServer;
-
-    //Lock for transaction
-    private static final Object TRANSACTION_LOCK = new Object();
 
     /**
      * Constructor for RMIServer

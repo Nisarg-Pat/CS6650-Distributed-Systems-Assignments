@@ -101,6 +101,12 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
 
     @Override
     public Object propose(Command command) throws RemoteException {
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         proposalID++;
         Proposal proposal = new Proposal(proposalID, command);
 
@@ -115,7 +121,7 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             List<Server> servers = getAllServers();
             for (Server server : servers) {
                 Promise promise = ((Acceptor) server).prepare(proposal);
-                if (promise.isPromise()) {
+                if (promise != null && promise.isPromise()) {
                     promisedServers++;
                     Proposal acceptedProposal = promise.getAcceptedProposal();
                     if (acceptedProposal != null && acceptedProposal.getProposalNumber() > maxProposalNumber) {
@@ -126,14 +132,17 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             }
 
             if (promisedServers <= servers.size() / 2) {
+                Log.logln(proposal+ " failed to reach a consensus!");
                 return false;
+            } else {
+                Log.logln(proposal+ " reached a consensus!");
             }
 
             int numAccepted = 0;
 
             for (Server server : servers) {
-                int value = ((Acceptor) server).accept(currentProposal);
-                if(value == proposalID) {
+                Integer value = ((Acceptor) server).accept(currentProposal);
+                if (value != null && value == proposalID) {
                     numAccepted++;
                 }
             }
@@ -142,7 +151,6 @@ public class MyCoordinatorServer extends UnicastRemoteObject implements Coordina
             for (Server server : servers) {
                 response = (boolean) ((Learner) server).learn(currentProposal);
             }
-
             return response;
         } catch (RemoteException e) {
             e.printStackTrace();
